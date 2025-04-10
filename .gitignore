@@ -27,4 +27,8 @@ yarn-error.log*
 .idea/
 .vscode/
 *.swp
-*.swo 
+*.swo
+
+# Images
+Image Apr 9, 2025, 10_02_26 PM.png
+*.png 
