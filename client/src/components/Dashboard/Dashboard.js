@@ -6,20 +6,60 @@ import '../../styles/pages/Dashboard.css';
 const AdminDashboard = ({ exeatRequests, navigate }) => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
 
-  const filteredRequests = exeatRequests.filter(request => {
-    const matchesFilter = filter === 'all' || request.status === filter;
-    const matchesSearch = request.student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         request.student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         request.student.matricNumber.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  // Filter and sort requests
+  const filteredRequests = exeatRequests
+    .filter(request => {
+      const matchesFilter = filter === 'all' || request.status === filter;
+      const matchesSearch = request.student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           request.student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           request.student.matricNumber.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesFilter && matchesSearch;
+    })
+    .sort((a, b) => {
+      let valueA, valueB;
+      
+      // Determine what to sort by
+      switch(sortBy) {
+        case 'studentName':
+          valueA = `${a.student.firstName} ${a.student.lastName}`.toLowerCase();
+          valueB = `${b.student.firstName} ${b.student.lastName}`.toLowerCase();
+          break;
+        case 'department':
+          valueA = a.student.department.toLowerCase();
+          valueB = b.student.department.toLowerCase();
+          break;
+        case 'status':
+          valueA = a.status.toLowerCase();
+          valueB = b.status.toLowerCase();
+          break;
+        case 'createdAt':
+        default:
+          valueA = new Date(a.createdAt);
+          valueB = new Date(b.createdAt);
+      }
+      
+      // Apply sort order
+      return sortOrder === 'asc' 
+        ? (valueA > valueB ? 1 : -1)
+        : (valueA < valueB ? 1 : -1);
+    });
 
   const stats = {
     total: exeatRequests.length,
     pending: exeatRequests.filter(req => req.status === 'pending').length,
     approved: exeatRequests.filter(req => req.status === 'approved').length,
     rejected: exeatRequests.filter(req => req.status === 'rejected').length
+  };
+
+  const handleRowClick = (requestId) => {
+    navigate(`/exeat/${requestId}`);
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
   return (
@@ -47,24 +87,56 @@ const AdminDashboard = ({ exeatRequests, navigate }) => {
         </div>
       </div>
 
-      <div className="filters">
-        <select 
-          value={filter} 
-          onChange={(e) => setFilter(e.target.value)}
-          className="filter-input"
-        >
-          <option value="all">All Requests</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-        </select>
-        <input
-          type="text"
-          placeholder="Search by student name or matric number..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="filter-input"
-        />
+      <div className="filter-controls">
+        <div className="filter-group">
+          <label className="filter-label">Filter Status</label>
+          <select 
+            value={filter} 
+            onChange={(e) => setFilter(e.target.value)}
+            className="filter-input"
+          >
+            <option value="all">All Requests</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        
+        <div className="filter-group">
+          <label className="filter-label">Sort By</label>
+          <select 
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value)}
+            className="filter-input"
+          >
+            <option value="createdAt">Date Requested</option>
+            <option value="studentName">Student Name</option>
+            <option value="department">Department</option>
+            <option value="status">Status</option>
+          </select>
+        </div>
+        
+        <div className="filter-group">
+          <label className="filter-label">Sort Order</label>
+          <button 
+            onClick={toggleSortOrder} 
+            className="filter-input"
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            {sortOrder === 'asc' ? 'Ascending ↑' : 'Descending ↓'}
+          </button>
+        </div>
+        
+        <div className="filter-group" style={{ flex: 1 }}>
+          <label className="filter-label">Search</label>
+          <input
+            type="text"
+            placeholder="Search by student name or matric number..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="filter-input"
+          />
+        </div>
       </div>
 
       {filteredRequests.length === 0 ? (
@@ -83,20 +155,34 @@ const AdminDashboard = ({ exeatRequests, navigate }) => {
           </thead>
           <tbody>
             {filteredRequests.map(request => (
-              <tr key={request._id}>
+              <tr key={request._id} onClick={() => handleRowClick(request._id)}>
                 <td>{request.student.firstName} {request.student.lastName}</td>
                 <td>{request.student.matricNumber}</td>
                 <td>{request.student.department}</td>
                 <td>{new Date(request.createdAt).toLocaleDateString()}</td>
                 <td>
-                  <span className={`status-badge status-${request.status.toLowerCase()}`}>
-                    {request.status}
-                  </span>
+                  {request.status === 'rejected' && request.rejectionReason ? (
+                    <div className="tooltip">
+                      <span className={`status-badge status-${request.status.toLowerCase()}`}>
+                        {request.status}
+                      </span>
+                      <span className="tooltip-text">
+                        Reason: {request.rejectionReason}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className={`status-badge status-${request.status.toLowerCase()}`}>
+                      {request.status}
+                    </span>
+                  )}
                 </td>
                 <td>
                   <button 
                     className="action-button primary"
-                    onClick={() => navigate(`/exeat/${request._id}`)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent row click event
+                      navigate(`/exeat/${request._id}`);
+                    }}
                   >
                     View Details
                   </button>
@@ -111,10 +197,52 @@ const AdminDashboard = ({ exeatRequests, navigate }) => {
 };
 
 const StudentDashboard = ({ exeatRequests, navigate }) => {
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
+
+  // Sort requests
+  const sortedRequests = [...exeatRequests].sort((a, b) => {
+    let valueA, valueB;
+    
+    // Determine what to sort by
+    switch(sortBy) {
+      case 'departureDate':
+        valueA = new Date(a.departureDate);
+        valueB = new Date(b.departureDate);
+        break;
+      case 'returnDate':
+        valueA = new Date(a.returnDate);
+        valueB = new Date(b.returnDate);
+        break;
+      case 'status':
+        valueA = a.status.toLowerCase();
+        valueB = b.status.toLowerCase();
+        break;
+      case 'createdAt':
+      default:
+        valueA = new Date(a.createdAt);
+        valueB = new Date(b.createdAt);
+    }
+    
+    // Apply sort order
+    return sortOrder === 'asc' 
+      ? (valueA > valueB ? 1 : -1)
+      : (valueA < valueB ? 1 : -1);
+  });
+
   const stats = {
     total: exeatRequests.length,
     pending: exeatRequests.filter(req => req.status === 'pending').length,
-    approved: exeatRequests.filter(req => req.status === 'approved').length
+    approved: exeatRequests.filter(req => req.status === 'approved').length,
+    rejected: exeatRequests.filter(req => req.status === 'rejected').length
+  };
+
+  const handleRowClick = (requestId) => {
+    navigate(`/exeat/${requestId}`);
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
   return (
@@ -142,6 +270,10 @@ const StudentDashboard = ({ exeatRequests, navigate }) => {
           <h3 className="stat-title">Approved Requests</h3>
           <p className="stat-value">{stats.approved}</p>
         </div>
+        <div className="stat-card">
+          <h3 className="stat-title">Rejected</h3>
+          <p className="stat-value">{stats.rejected}</p>
+        </div>
       </div>
 
       {exeatRequests.length === 0 ? (
@@ -155,39 +287,82 @@ const StudentDashboard = ({ exeatRequests, navigate }) => {
           </button>
         </div>
       ) : (
-        <table className="dashboard-table">
-          <thead>
-            <tr>
-              <th>Request Date</th>
-              <th>Departure Date</th>
-              <th>Return Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {exeatRequests.map(request => (
-              <tr key={request._id}>
-                <td>{new Date(request.createdAt).toLocaleDateString()}</td>
-                <td>{new Date(request.departureDate).toLocaleDateString()}</td>
-                <td>{new Date(request.returnDate).toLocaleDateString()}</td>
-                <td>
-                  <span className={`status-badge status-${request.status.toLowerCase()}`}>
-                    {request.status}
-                  </span>
-                </td>
-                <td>
-                  <button 
-                    className="action-button primary"
-                    onClick={() => navigate(`/exeat/${request._id}`)}
-                  >
-                    View Details
-                  </button>
-                </td>
+        <>
+          <div className="filter-controls">
+            <div className="filter-group">
+              <label className="filter-label">Sort By</label>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+                className="filter-input"
+              >
+                <option value="createdAt">Date Requested</option>
+                <option value="departureDate">Departure Date</option>
+                <option value="returnDate">Return Date</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
+            
+            <div className="filter-group">
+              <label className="filter-label">Sort Order</label>
+              <button 
+                onClick={toggleSortOrder} 
+                className="filter-input"
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                {sortOrder === 'asc' ? 'Ascending ↑' : 'Descending ↓'}
+              </button>
+            </div>
+          </div>
+        
+          <table className="dashboard-table">
+            <thead>
+              <tr>
+                <th>Request Date</th>
+                <th>Departure Date</th>
+                <th>Return Date</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sortedRequests.map(request => (
+                <tr key={request._id} onClick={() => handleRowClick(request._id)}>
+                  <td>{new Date(request.createdAt).toLocaleDateString()}</td>
+                  <td>{new Date(request.departureDate).toLocaleDateString()}</td>
+                  <td>{new Date(request.returnDate).toLocaleDateString()}</td>
+                  <td>
+                    {request.status === 'rejected' && request.rejectionReason ? (
+                      <div className="tooltip">
+                        <span className={`status-badge status-${request.status.toLowerCase()}`}>
+                          {request.status}
+                        </span>
+                        <span className="tooltip-text">
+                          Reason: {request.rejectionReason}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className={`status-badge status-${request.status.toLowerCase()}`}>
+                        {request.status}
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    <button 
+                      className="action-button primary"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click event
+                        navigate(`/exeat/${request._id}`);
+                      }}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       )}
     </div>
   );
