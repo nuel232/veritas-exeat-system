@@ -74,30 +74,101 @@ a:hover {
 }
 
 .form-group {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--form-group-spacing);
 }
 
 .form-label {
   display: block;
-  margin-bottom: var(--spacing-xs);
-  font-size: var(--font-size-small);
+  margin-bottom: var(--label-margin-bottom);
+  font-size: var(--label-font-size);
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .form-input {
   width: 100%;
+  height: var(--input-height);
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-border);
+  border: var(--input-border-width) solid var(--color-border);
   border-radius: var(--border-radius-md);
   font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-white);
   transition: var(--transition-base);
+  box-shadow: var(--shadow-input);
+  font-family: var(--font-family-base);
 }
 
 .form-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--input-focus-ring);
+}
+
+.form-input::placeholder {
+  color: var(--color-placeholder);
+  opacity: 1;
+}
+
+.form-input.error {
+  border-color: var(--color-danger);
+}
+
+.form-input.error:focus {
+  box-shadow: var(--input-error-ring);
+}
+
+.form-input.success {
+  border-color: var(--color-success);
+}
+
+.form-input.success:focus {
+  box-shadow: var(--input-success-ring);
+}
+
+.form-error {
+  color: var(--color-danger);
+  font-size: var(--font-size-small);
+  margin-top: var(--spacing-xs);
+  display: block;
+}
+
+/* Form help text */
+.form-help {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  margin-top: var(--spacing-xs);
+}
+
+/* Form icon */
+.form-icon {
+  position: relative;
+}
+
+.form-icon input {
+  padding-right: 2.5rem;
+}
+
+.form-icon-right {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+/* Date input formatting */
+input[type="date"].form-input,
+input[type="datetime-local"].form-input {
+  min-height: var(--input-height);
+}
+
+/* Textarea */
+textarea.form-input {
+  min-height: 100px;
+  resize: vertical;
 }
 
 .form-button {

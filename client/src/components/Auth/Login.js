@@ -11,6 +11,9 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [role, setRole] = useState('student');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,10 +28,48 @@ const Login = () => {
 
   const { email, password } = formData;
 
-  const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!email) {
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = 'Email is invalid';
+    }
+    
+    if (!password) {
+      errors.password = 'Password is required';
+    } else if (password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const onChange = e => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Clear validation error when user types
+    if (validationErrors[e.target.name]) {
+      setValidationErrors({
+        ...validationErrors,
+        [e.target.name]: ''
+      });
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onSubmit = async e => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setIsLoading(true);
+    setError('');
+    
     try {
       const res = await api.post('/api/auth/login', {
         ...formData,
@@ -38,7 +79,9 @@ const Login = () => {
       sessionStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred');
+      setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,26 +110,43 @@ const Login = () => {
                 value={email}
                 onChange={onChange}
                 required
-                className="form-input"
+                className={`form-input ${validationErrors.email ? 'error' : ''}`}
                 placeholder="Enter your email"
               />
+              {validationErrors.email && <span className="form-error">{validationErrors.email}</span>}
             </div>
 
             <div className="form-group">
               <label className="form-label">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={password}
-                onChange={onChange}
-                required
-                className="form-input"
-                placeholder="Enter your password"
-              />
+              <div className="form-icon">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={password}
+                  onChange={onChange}
+                  required
+                  className={`form-input ${validationErrors.password ? 'error' : ''}`}
+                  placeholder="Enter your password"
+                />
+                <span 
+                  className="form-icon-right" 
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  role="button"
+                  tabIndex="0"
+                >
+                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                </span>
+              </div>
+              {validationErrors.password && <span className="form-error">{validationErrors.password}</span>}
             </div>
 
-            <button type="submit" className="btn btn-primary auth-button">
-              Login
+            <button 
+              type="submit" 
+              className="btn btn-primary auth-button"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging in...' : 'Login'}
             </button>
 
             {role === 'student' && (

@@ -4,6 +4,7 @@ import { useReactToPrint } from 'react-to-print';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import api from '../../utils/api';
+import '../../styles/components/ExeatRequest.css';
 
 const ExeatDetails = () => {
   const [exeat, setExeat] = useState(null);
@@ -91,9 +92,9 @@ const ExeatDetails = () => {
   }
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Exeat Request Details</h1>
+    <div className="exeat-request-container">
+      <div className="exeat-request-header">
+        <h1 className="exeat-request-title">Exeat Request Details</h1>
         <div className="header-actions">
           <button 
             className="btn btn-secondary"
@@ -122,7 +123,7 @@ const ExeatDetails = () => {
         </div>
       )}
 
-      <div className="dashboard-card" ref={componentRef}>
+      <div className="exeat-request-form" ref={componentRef}>
         <div className="exeat-header">
           <h2>VERITAS UNIVERSITY</h2>
           <h3>STUDENT EXEAT SLIP</h3>
@@ -254,15 +255,15 @@ const ExeatDetails = () => {
       </div>
 
       {user && user.role === 'admin' && exeat.status === 'pending' && (
-        <div className="action-buttons">
+        <div className="form-actions">
           <button
-            className="btn btn-success"
+            className="submit-button"
             onClick={() => handleStatusUpdate('approved')}
           >
             <i className="fas fa-check"></i> Approve Request
           </button>
           <button
-            className="btn btn-danger"
+            className="cancel-button"
             onClick={() => {
               const reason = prompt('Please enter rejection reason:');
               if (reason) {
@@ -276,9 +277,9 @@ const ExeatDetails = () => {
       )}
 
       {user && user.role === 'admin' && exeat.status === 'approved' && !exeat.used && (
-        <div className="action-buttons">
+        <div className="form-actions">
           <button
-            className="btn btn-warning"
+            className="submit-button"
             onClick={handleMarkAsUsed}
           >
             <i className="fas fa-check-double"></i> Mark as Used

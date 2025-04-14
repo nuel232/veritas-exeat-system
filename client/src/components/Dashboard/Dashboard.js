@@ -155,7 +155,11 @@ const AdminDashboard = ({ exeatRequests, navigate }) => {
           </thead>
           <tbody>
             {filteredRequests.map(request => (
-              <tr key={request._id} onClick={() => handleRowClick(request._id)}>
+              <tr 
+                key={request._id} 
+                onClick={() => handleRowClick(request._id)}
+                className="clickable-row"
+              >
                 <td>{request.student.firstName} {request.student.lastName}</td>
                 <td>{request.student.matricNumber}</td>
                 <td>{request.student.department}</td>
@@ -327,7 +331,11 @@ const StudentDashboard = ({ exeatRequests, navigate }) => {
             </thead>
             <tbody>
               {sortedRequests.map(request => (
-                <tr key={request._id} onClick={() => handleRowClick(request._id)}>
+                <tr 
+                  key={request._id} 
+                  onClick={() => handleRowClick(request._id)}
+                  className="clickable-row"
+                >
                   <td>{new Date(request.createdAt).toLocaleDateString()}</td>
                   <td>{new Date(request.departureDate).toLocaleDateString()}</td>
                   <td>{new Date(request.returnDate).toLocaleDateString()}</td>
