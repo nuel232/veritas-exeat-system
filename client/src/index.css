@@ -1,6 +1,6 @@
 /* Import design system */
-@import './styles/common/variables.css';
-@import './styles/common/base.css';
+@import './styles/variables.css';
+@import './styles/common/reset.css';
 
 /* Import layout styles */
 @import './styles/layout/Navbar.css';
@@ -17,13 +17,12 @@
 /* Global styles */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-family-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-background);
   color: var(--color-text);
+  line-height: 1.6;
 }
 
 code {

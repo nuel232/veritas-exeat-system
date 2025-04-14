@@ -1,3 +1,5 @@
+@import '../variables.css';
+
 .dashboard {
   padding: var(--spacing-lg);
   min-height: calc(100vh - 64px); /* Account for navbar height */
@@ -12,11 +14,14 @@
   font-size: var(--font-size-h1);
   color: var(--color-text);
   margin-bottom: var(--spacing-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .dashboard-subtitle {
   font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
 }
 
 .dashboard-content {
@@ -37,6 +42,8 @@
   font-size: var(--font-size-h2);
   color: var(--color-text);
   margin: 0;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .dashboard-stats {
@@ -65,7 +72,8 @@
   color: var(--color-text-secondary);
   margin-bottom: var(--spacing-xs);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: var(--letter-spacing-wider);
+  font-weight: var(--font-weight-medium);
 }
 
 .stat-value {
@@ -89,6 +97,7 @@
   color: var(--color-text);
   background-color: var(--color-white);
   min-width: 200px;
+  font-family: var(--font-family-base);
 }
 
 .filter-input:focus {
@@ -117,7 +126,7 @@
   background-color: var(--color-gray-light);
   text-transform: uppercase;
   font-size: var(--font-size-small);
-  letter-spacing: 0.5px;
+  letter-spacing: var(--letter-spacing-wider);
 }
 
 .dashboard-table tr:last-child td {
@@ -139,6 +148,7 @@
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-medium);
   text-transform: capitalize;
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .status-pending {
@@ -161,9 +171,11 @@
   border: none;
   border-radius: var(--border-radius-md);
   font-size: var(--font-size-small);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: var(--transition-base);
+  letter-spacing: var(--letter-spacing-wide);
+  font-family: var(--font-family-base);
 }
 
 .action-button.primary {
@@ -179,6 +191,17 @@
   text-align: center;
   padding: var(--spacing-2xl) var(--spacing-xl);
   color: var(--color-text-secondary);
+}
+
+.empty-state h3 {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-md);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.empty-state p {
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-base);
 }
 
 .loading {

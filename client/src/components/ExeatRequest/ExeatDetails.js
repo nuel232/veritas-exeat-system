@@ -70,6 +70,18 @@ const ExeatDetails = () => {
     pdf.save(`exeat-request-${exeat.student?.matricNumber || 'slip'}.pdf`);
   };
 
+  const formatDate = (dateString) => {
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -87,26 +99,26 @@ const ExeatDetails = () => {
             className="btn btn-secondary"
             onClick={handlePrint}
           >
-            Print Exeat
+            <i className="fas fa-print"></i> Print Exeat
           </button>
           <button 
             className="btn btn-secondary"
             onClick={handleDownloadPDF}
           >
-            Download PDF
+            <i className="fas fa-file-pdf"></i> Download PDF
           </button>
           <button 
             className="btn btn-primary"
             onClick={() => navigate('/dashboard')}
           >
-            Back to Dashboard
+            <i className="fas fa-arrow-left"></i> Back to Dashboard
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="alert alert-error">
-          {error}
+        <div className="alert alert-danger">
+          <i className="fas fa-exclamation-circle"></i> {error}
         </div>
       )}
 
@@ -123,51 +135,83 @@ const ExeatDetails = () => {
         </div>
         <div className="exeat-details">
           <div className="detail-group">
-            <label className="detail-label">Student Name</label>
+            <label className="detail-label">
+              <i className="fas fa-user"></i> Student Name
+            </label>
             <p className="detail-value">{exeat.student?.firstName} {exeat.student?.lastName}</p>
           </div>
+          
           {exeat.student?.department && (
             <div className="detail-group">
-              <label className="detail-label">Department</label>
+              <label className="detail-label">
+                <i className="fas fa-building"></i> Department
+              </label>
               <p className="detail-value">{exeat.student.department}</p>
             </div>
           )}
+          
           {exeat.student?.matricNumber && (
             <div className="detail-group">
-              <label className="detail-label">Matric Number</label>
+              <label className="detail-label">
+                <i className="fas fa-id-card"></i> Matric Number
+              </label>
               <p className="detail-value">{exeat.student.matricNumber}</p>
             </div>
           )}
+          
           <div className="detail-group">
-            <label className="detail-label">Reason</label>
+            <label className="detail-label">
+              <i className="fas fa-comment-alt"></i> Reason
+            </label>
             <p className="detail-value">{exeat.reason}</p>
           </div>
+          
           <div className="detail-group">
-            <label className="detail-label">Destination</label>
+            <label className="detail-label">
+              <i className="fas fa-map-marker-alt"></i> Destination
+            </label>
             <p className="detail-value">{exeat.destination}</p>
           </div>
+          
           <div className="detail-group">
-            <label className="detail-label">Departure Date</label>
-            <p className="detail-value">{new Date(exeat.departureDate).toLocaleString()}</p>
+            <label className="detail-label">
+              <i className="fas fa-plane-departure"></i> Departure Date
+            </label>
+            <p className="detail-value">{formatDate(exeat.departureDate)}</p>
           </div>
+          
           <div className="detail-group">
-            <label className="detail-label">Return Date</label>
-            <p className="detail-value">{new Date(exeat.returnDate).toLocaleString()}</p>
+            <label className="detail-label">
+              <i className="fas fa-plane-arrival"></i> Return Date
+            </label>
+            <p className="detail-value">{formatDate(exeat.returnDate)}</p>
           </div>
+          
           <div className="detail-group">
-            <label className="detail-label">Emergency Contact Name</label>
+            <label className="detail-label">
+              <i className="fas fa-user-shield"></i> Emergency Contact Name
+            </label>
             <p className="detail-value">{exeat.emergencyContact?.name}</p>
           </div>
+          
           <div className="detail-group">
-            <label className="detail-label">Emergency Contact Phone</label>
+            <label className="detail-label">
+              <i className="fas fa-phone"></i> Emergency Contact Phone
+            </label>
             <p className="detail-value">{exeat.emergencyContact?.phone}</p>
           </div>
+          
           <div className="detail-group">
-            <label className="detail-label">Emergency Contact Relationship</label>
+            <label className="detail-label">
+              <i className="fas fa-people-arrows"></i> Emergency Contact Relationship
+            </label>
             <p className="detail-value">{exeat.emergencyContact?.relationship}</p>
           </div>
+          
           <div className="detail-group">
-            <label className="detail-label">Status</label>
+            <label className="detail-label">
+              <i className="fas fa-tag"></i> Status
+            </label>
             <p className={`status-badge status-${exeat.status.toLowerCase()}`}>
               {exeat.status}
             </p>
@@ -175,16 +219,18 @@ const ExeatDetails = () => {
 
           {exeat.used && (
             <div className="detail-group">
-              <label className="detail-label">Used On</label>
-              <p className="detail-value">{new Date(exeat.usedAt).toLocaleString()}</p>
+              <label className="detail-label">
+                <i className="fas fa-calendar-check"></i> Used On
+              </label>
+              <p className="detail-value">{formatDate(exeat.usedAt)}</p>
             </div>
           )}
 
           {exeat.status === 'approved' && (
             <div className="approval-section">
               <div className="signature-line">
-                <p>Approved by: {exeat.approvedBy?.firstName} {exeat.approvedBy?.lastName}</p>
-                <p>Date: {new Date(exeat.updatedAt).toLocaleDateString()}</p>
+                <p><i className="fas fa-check-circle"></i> Approved by: {exeat.approvedBy?.firstName} {exeat.approvedBy?.lastName}</p>
+                <p><i className="fas fa-calendar"></i> Date: {new Date(exeat.updatedAt).toLocaleDateString()}</p>
               </div>
               <div className="stamp">APPROVED</div>
             </div>
@@ -193,11 +239,13 @@ const ExeatDetails = () => {
           {exeat.status === 'rejected' && (
             <div className="rejection-section">
               <div className="signature-line">
-                <p>Rejected by: {exeat.approvedBy?.firstName} {exeat.approvedBy?.lastName}</p>
-                <p>Date: {new Date(exeat.updatedAt).toLocaleDateString()}</p>
+                <p><i className="fas fa-times-circle"></i> Rejected by: {exeat.approvedBy?.firstName} {exeat.approvedBy?.lastName}</p>
+                <p><i className="fas fa-calendar"></i> Date: {new Date(exeat.updatedAt).toLocaleDateString()}</p>
               </div>
               <div className="rejection-reason">
-                <p><strong>Reason:</strong> {exeat.rejectionReason || 'No reason provided'}</p>
+                <p>
+                  <i className="fas fa-exclamation-triangle"></i> <strong>Reason for Rejection:</strong> {exeat.rejectionReason || 'No reason provided'}
+                </p>
               </div>
               <div className="stamp rejected-stamp">REJECTED</div>
             </div>
@@ -205,13 +253,13 @@ const ExeatDetails = () => {
         </div>
       </div>
 
-      {user.role === 'admin' && exeat.status === 'pending' && (
+      {user && user.role === 'admin' && exeat.status === 'pending' && (
         <div className="action-buttons">
           <button
             className="btn btn-success"
             onClick={() => handleStatusUpdate('approved')}
           >
-            Approve Request
+            <i className="fas fa-check"></i> Approve Request
           </button>
           <button
             className="btn btn-danger"
@@ -222,18 +270,18 @@ const ExeatDetails = () => {
               }
             }}
           >
-            Reject Request
+            <i className="fas fa-times"></i> Reject Request
           </button>
         </div>
       )}
 
-      {user.role === 'admin' && exeat.status === 'approved' && !exeat.used && (
+      {user && user.role === 'admin' && exeat.status === 'approved' && !exeat.used && (
         <div className="action-buttons">
           <button
             className="btn btn-warning"
             onClick={handleMarkAsUsed}
           >
-            Mark as Used
+            <i className="fas fa-check-double"></i> Mark as Used
           </button>
         </div>
       )}

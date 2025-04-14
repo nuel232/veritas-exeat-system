@@ -197,43 +197,124 @@ const Dashboard = () => {
   const [exeatRequests, setExeatRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [debugInfo, setDebugInfo] = useState(null);
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
+  
+  // Try to get user from session storage first, then local storage
+  const userString = sessionStorage.getItem('user') || localStorage.getItem('user');
+  const [user, setUser] = useState(userString ? JSON.parse(userString) : null);
 
   useEffect(() => {
+    // If no user is found, redirect to login
+    if (!user) {
+      setError('No user found. Please login again.');
+      setLoading(false);
+      setTimeout(() => navigate('/login'), 3000);
+      return;
+    }
+
     const fetchExeatRequests = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        
+        if (!token) {
+          setError('No authentication token found. Please login again.');
+          setLoading(false);
+          setTimeout(() => navigate('/login'), 3000);
+          return;
+        }
+
+        // Add debug information
+        setDebugInfo({
+          user: user,
+          token: token ? `${token.substring(0, 10)}...` : 'None',
+          endpoint: user.role === 'admin' ? '/api/exeat' : '/api/exeat/my-requests'
+        });
+
+        // Make the API request with proper auth header
         const endpoint = user.role === 'admin' ? '/api/exeat' : '/api/exeat/my-requests';
         const res = await api.get(endpoint, {
-          headers: { 'x-auth-token': token }
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
         });
-        setExeatRequests(res.data);
+        
+        setExeatRequests(Array.isArray(res.data) ? res.data : []);
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch exeat requests');
+        console.error('Error fetching exeat requests:', err);
+        
+        // Extract detailed error information
+        const errorMessage = err.response?.data?.message || err.message || 'An unknown error occurred';
+        const statusCode = err.response?.status || 'No status';
+        
+        setError(`Failed to fetch exeat requests: ${errorMessage} (Status: ${statusCode})`);
         setLoading(false);
       }
     };
 
     fetchExeatRequests();
-  }, [user.role]);
+  }, [user, navigate]);
+
+  // Check for connection issues with the backend
+  useEffect(() => {
+    const checkServerStatus = async () => {
+      try {
+        await api.get('/api/test/db');
+        // Server is reachable, no action needed
+      } catch (err) {
+        setError(prev => prev || 'Cannot connect to the server. Please check if the backend is running.');
+      }
+    };
+    
+    checkServerStatus();
+  }, []);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading">Loading dashboard data...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="dashboard">
+        <div className="alert alert-error">
+          {error || 'No user found. Please login again.'}
+          <button 
+            onClick={() => navigate('/login')}
+            className="action-button primary"
+            style={{ marginLeft: '10px' }}
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="dashboard">
       <div className="dashboard-header">
         <div>
-          <h1 className="dashboard-title">Welcome, {user?.firstName}!</h1>
+          <h1 className="dashboard-title">Welcome, {user?.firstName || 'User'}!</h1>
           <p className="dashboard-subtitle">
             {user.role === 'admin' 
               ? 'Manage student exeat requests'
               : 'Manage your exeat requests'}
           </p>
         </div>
+        <button onClick={handleLogout} className="action-button primary">
+          Logout
+        </button>
       </div>
 
       {error && (
@@ -242,10 +323,42 @@ const Dashboard = () => {
         </div>
       )}
 
-      {user.role === 'admin' ? (
-        <AdminDashboard exeatRequests={exeatRequests} navigate={navigate} />
-      ) : (
-        <StudentDashboard exeatRequests={exeatRequests} navigate={navigate} />
+      {debugInfo && debugInfo.user && debugInfo.user.role === 'admin' && (
+        <div className="debug-info" style={{ marginBottom: '20px', fontSize: '0.8rem', color: '#666' }}>
+          <details>
+            <summary>Debug Information (Admin Only)</summary>
+            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+          </details>
+        </div>
+      )}
+
+      {!error && exeatRequests.length === 0 && (
+        <div className="dashboard-content">
+          <div className="empty-state">
+            <h3>No Exeat Requests Found</h3>
+            <p>
+              {user.role === 'admin' 
+                ? 'There are no exeat requests in the system yet.' 
+                : 'You have not created any exeat requests yet.'}
+            </p>
+            {user.role !== 'admin' && (
+              <button 
+                className="action-button primary"
+                onClick={() => navigate('/exeat-request')}
+              >
+                Create Your First Request
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!error && exeatRequests.length > 0 && (
+        user.role === 'admin' ? (
+          <AdminDashboard exeatRequests={exeatRequests} navigate={navigate} />
+        ) : (
+          <StudentDashboard exeatRequests={exeatRequests} navigate={navigate} />
+        )
       )}
     </div>
   );
