@@ -150,6 +150,7 @@
   margin-bottom: var(--spacing-xl);
   padding-bottom: var(--spacing-lg);
   border-bottom: 2px solid var(--color-primary);
+  position: relative;
 }
 
 .exeat-header h2 {
@@ -163,7 +164,8 @@
   color: var(--color-text-secondary);
 }
 
-.approval-section {
+.approval-section,
+.rejection-section {
   margin-top: var(--spacing-xl);
   padding-top: var(--spacing-lg);
   border-top: 1px solid var(--color-border);
@@ -173,6 +175,13 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: var(--spacing-lg);
+}
+
+.rejection-reason {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--color-danger-light);
+  border-radius: var(--border-radius-md);
 }
 
 .stamp {
@@ -186,6 +195,48 @@
   border-radius: var(--border-radius-sm);
   transform: rotate(-15deg);
   opacity: 0.8;
+}
+
+.exeat-used-stamp,
+.exeat-expired-stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 4rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: 0.5;
+  border: 8px solid;
+  padding: 10px 20px;
+  border-radius: 10px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.exeat-used-stamp {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.exeat-expired-stamp {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.status-used {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.status-expired {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger-dark);
+}
+
+.rejected-stamp {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 /* Print styles */

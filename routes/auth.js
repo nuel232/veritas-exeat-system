@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
 
 // Register a new user
 router.post('/register', [
@@ -86,7 +87,7 @@ router.post('/register', [
 // Login user
 router.post('/login', [
   body('email').isEmail().withMessage('Please enter a valid email'),
-  body('password').notEmpty().withMessage('Password is required')
+  body('password').exists().withMessage('Password is required')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -94,41 +95,48 @@ router.post('/login', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
-    // Check if user exists
-    const user = await User.findOne({ email });
+    // Find user by email
+    let user = await User.findOne({ email });
+
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Check password
-    const isMatch = await user.comparePassword(password);
+    // If role was specified, check if user has that role
+    if (role && user.role !== role) {
+      return res.status(400).json({ message: `Invalid credentials for ${role} login` });
+    }
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Generate JWT token
+    const payload = {
+      userId: user._id
+    };
+
     const token = jwt.sign(
-      { userId: user._id },
+      payload,
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
+    // Remove password from response
+    user = user.toObject();
+    delete user.password;
+
     res.json({
       token,
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-        office: user.office,
-        staffId: user.staffId
-      }
+      user
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error in login:', error.message);
     res.status(500).json({ message: 'Server error' });
   }
 });

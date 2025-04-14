@@ -1,0 +1,141 @@
+.landing-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('../../assets/images/background-image.png');
+  background-size: cover;
+  background-position: center;
+  padding: 20px;
+}
+
+.landing-wrapper {
+  display: flex;
+  max-width: 1200px;
+  width: 100%;
+  min-height: 400px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.landing-image-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.landing-content-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.logo-container {
+  margin-bottom: 20px;
+}
+
+.landing-logo {
+  width: 120px;
+  height: auto;
+}
+
+.landing-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 5px;
+}
+
+.landing-subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 40px;
+}
+
+.landing-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.landing-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.landing-button i {
+  margin-right: 10px;
+}
+
+.student-button {
+  background-color: var(--color-primary);
+}
+
+.student-button:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.staff-button {
+  background-color: var(--color-success);
+}
+
+.staff-button:hover {
+  background-color: var(--color-success-dark);
+}
+
+.applicant-button {
+  background-color: var(--color-warning);
+}
+
+.applicant-button:hover {
+  background-color: var(--color-warning-dark);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .landing-wrapper {
+    flex-direction: column;
+    max-width: 400px;
+  }
+
+  .landing-image-section {
+    display: none;
+  }
+
+  .landing-content-section {
+    padding: 30px 20px;
+  }
+
+  .landing-title {
+    font-size: 1.8rem;
+  }
+
+  .landing-subtitle {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+} 

@@ -67,4 +67,12 @@
   --transition-base: all 0.2s ease-in-out;
   --transition-slow: all 0.3s ease-in-out;
   --transition-fast: all 0.1s ease-in-out;
+}
+
+/* Global Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
 } 

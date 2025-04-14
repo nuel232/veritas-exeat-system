@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import '../../styles/components/Login.css';
+import logoImage from '../../assets/images/logo-desk.png';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +10,18 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [role, setRole] = useState('student');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Get role from URL query parameter
+    const params = new URLSearchParams(location.search);
+    const roleParam = params.get('role');
+    if (roleParam) {
+      setRole(roleParam);
+    }
+  }, [location]);
 
   const { email, password } = formData;
 
@@ -18,9 +30,12 @@ const Login = () => {
   const onSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await api.post('/api/auth/login', formData);
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+      const res = await api.post('/api/auth/login', {
+        ...formData,
+        role
+      });
+      sessionStorage.setItem('token', res.data.token);
+      sessionStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred');
@@ -28,58 +43,69 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1 className="login-title">Veritas University Exeat System</h1>
-          <p className="login-subtitle">Sign in to your account</p>
-        </div>
+    <div className="auth-container">
+      <div className="auth-wrapper">
+        <div className="auth-form-container">
+          <div className="auth-header">
+            <img src={logoImage} alt="Veritas Logo" className="auth-logo" />
+            <h1 className="auth-title">Veritas Exeat Permission System</h1>
+            <p className="auth-subtitle">{role === 'admin' ? 'Admin Login' : 'Student Login'}</p>
+          </div>
 
-        <form onSubmit={onSubmit} className="login-form">
-          {error && (
-            <div className="alert alert-error">
-              {error}
+          <form onSubmit={onSubmit} className="auth-form">
+            {error && (
+              <div className="alert alert-danger">
+                {error}
+              </div>
+            )}
+
+            <div className="form-group">
+              <label className="form-label">Email Address</label>
+              <input
+                type="email"
+                name="email"
+                value={email}
+                onChange={onChange}
+                required
+                className="form-input"
+                placeholder="Enter your email"
+              />
             </div>
-          )}
 
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">Email address</label>
-            <input
-              id="email"
-              type="email"
-              name="email"
-              value={email}
-              onChange={onChange}
-              required
-              className="form-input"
-              placeholder="Enter your email"
-            />
-          </div>
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <input
+                type="password"
+                name="password"
+                value={password}
+                onChange={onChange}
+                required
+                className="form-input"
+                placeholder="Enter your password"
+              />
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
-            <input
-              id="password"
-              type="password"
-              name="password"
-              value={password}
-              onChange={onChange}
-              required
-              className="form-input"
-              placeholder="Enter your password"
-            />
-          </div>
+            <button type="submit" className="btn btn-primary auth-button">
+              Login
+            </button>
 
-          <button type="submit" className="login-button">
-            Sign in
-          </button>
-        </form>
+            {role === 'student' && (
+              <div className="auth-links">
+                <p>
+                  Don't have an account?{' '}
+                  <Link to="/register" className="auth-link">
+                    Register
+                  </Link>
+                </p>
+              </div>
+            )}
 
-        <div className="login-footer">
-          Don't have an account?{' '}
-          <Link to="/register" className="login-link">
-            Register here
-          </Link>
+            <div className="auth-back-link">
+              <Link to="/" className="back-to-home">
+                ← Back to Home
+              </Link>
+            </div>
+          </form>
         </div>
       </div>
     </div>

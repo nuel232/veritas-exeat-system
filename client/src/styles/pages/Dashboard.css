@@ -235,4 +235,12 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
 } 

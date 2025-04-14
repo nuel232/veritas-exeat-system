@@ -127,4 +127,41 @@ router.get('/', auth, authorize('admin'), async (req, res) => {
   }
 });
 
+// Mark exeat as used (admin only)
+router.patch('/:id/use', [
+  auth,
+  authorize('admin')
+], async (req, res) => {
+  try {
+    const result = await Exeat.markAsUsed(req.params.id);
+    
+    if (!result.success) {
+      return res.status(400).json({ message: result.message });
+    }
+    
+    const exeat = await Exeat.findById(req.params.id)
+      .populate('student', 'firstName lastName email matricNumber')
+      .populate('approvedBy', 'firstName lastName');
+      
+    res.json(exeat);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Check exeat validity
+router.get('/:id/validate', [
+  auth,
+  authorize('admin')
+], async (req, res) => {
+  try {
+    const result = await Exeat.isValid(req.params.id);
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router; 

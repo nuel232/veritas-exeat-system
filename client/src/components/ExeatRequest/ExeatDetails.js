@@ -11,7 +11,7 @@ const ExeatDetails = () => {
   const [error, setError] = useState('');
   const { id } = useParams();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(sessionStorage.getItem('user'));
   const componentRef = useRef();
 
   useEffect(() => {
@@ -29,12 +29,26 @@ const ExeatDetails = () => {
     fetchExeat();
   }, [id]);
 
-  const handleStatusUpdate = async (status) => {
+  const handleStatusUpdate = async (status, rejectionReason) => {
     try {
-      await api.patch(`/api/exeat/${id}/status`, { status });
-      setExeat({ ...exeat, status });
+      const data = { status };
+      if (status === 'rejected' && rejectionReason) {
+        data.rejectionReason = rejectionReason;
+      }
+      
+      await api.patch(`/api/exeat/${id}/status`, data);
+      setExeat({ ...exeat, status, rejectionReason });
     } catch (err) {
-      setError('Failed to update status');
+      setError(err.response?.data?.message || 'Failed to update status');
+    }
+  };
+
+  const handleMarkAsUsed = async () => {
+    try {
+      const res = await api.patch(`/api/exeat/${id}/use`);
+      setExeat(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to mark exeat as used');
     }
   };
 
@@ -100,6 +114,12 @@ const ExeatDetails = () => {
         <div className="exeat-header">
           <h2>VERITAS UNIVERSITY</h2>
           <h3>STUDENT EXEAT SLIP</h3>
+          {exeat.status === 'used' && (
+            <div className="exeat-used-stamp">USED</div>
+          )}
+          {exeat.status === 'expired' && (
+            <div className="exeat-expired-stamp">EXPIRED</div>
+          )}
         </div>
         <div className="exeat-details">
           <div className="detail-group">
@@ -153,13 +173,33 @@ const ExeatDetails = () => {
             </p>
           </div>
 
+          {exeat.used && (
+            <div className="detail-group">
+              <label className="detail-label">Used On</label>
+              <p className="detail-value">{new Date(exeat.usedAt).toLocaleString()}</p>
+            </div>
+          )}
+
           {exeat.status === 'approved' && (
             <div className="approval-section">
               <div className="signature-line">
                 <p>Approved by: {exeat.approvedBy?.firstName} {exeat.approvedBy?.lastName}</p>
-                <p>Date: {new Date().toLocaleDateString()}</p>
+                <p>Date: {new Date(exeat.updatedAt).toLocaleDateString()}</p>
               </div>
               <div className="stamp">APPROVED</div>
+            </div>
+          )}
+
+          {exeat.status === 'rejected' && (
+            <div className="rejection-section">
+              <div className="signature-line">
+                <p>Rejected by: {exeat.approvedBy?.firstName} {exeat.approvedBy?.lastName}</p>
+                <p>Date: {new Date(exeat.updatedAt).toLocaleDateString()}</p>
+              </div>
+              <div className="rejection-reason">
+                <p><strong>Reason:</strong> {exeat.rejectionReason || 'No reason provided'}</p>
+              </div>
+              <div className="stamp rejected-stamp">REJECTED</div>
             </div>
           )}
         </div>
@@ -178,11 +218,22 @@ const ExeatDetails = () => {
             onClick={() => {
               const reason = prompt('Please enter rejection reason:');
               if (reason) {
-                handleStatusUpdate('rejected');
+                handleStatusUpdate('rejected', reason);
               }
             }}
           >
             Reject Request
+          </button>
+        </div>
+      )}
+
+      {user.role === 'admin' && exeat.status === 'approved' && !exeat.used && (
+        <div className="action-buttons">
+          <button
+            className="btn btn-warning"
+            onClick={handleMarkAsUsed}
+          >
+            Mark as Used
           </button>
         </div>
       )}
