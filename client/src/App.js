@@ -4,7 +4,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import ExeatRequest from './components/Exeat/ExeatRequest';
-import ExeatDetails from './components/ExeatRequest/ExeatDetails';
+import ExeatDetails from './components/Exeat/ExeatDetails';
 import Navbar from './components/Layout/Navbar';
 import LandingPage from './components/Auth/LandingPage';
 import './styles/variables.css';

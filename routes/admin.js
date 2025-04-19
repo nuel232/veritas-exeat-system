@@ -3,6 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { auth, authorize } = require('../middleware/auth');
 const User = require('../models/User');
+const Exeat = require('../models/Exeat');
 
 // Get all users
 router.get('/users', auth, authorize('admin'), async (req, res) => {

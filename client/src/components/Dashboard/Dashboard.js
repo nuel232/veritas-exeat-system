@@ -70,72 +70,60 @@ const AdminDashboard = ({ exeatRequests, navigate }) => {
 
       <div className="dashboard-stats">
         <div className="stat-card">
-          <h3 className="stat-title">Total Requests</h3>
-          <p className="stat-value">{stats.total}</p>
+          <div className="stat-title">TOTAL REQUESTS</div>
+          <div className="stat-value">{stats.total}</div>
+          <div className="stat-icon"><i className="fas fa-clipboard-list"></i></div>
         </div>
-        <div className="stat-card">
-          <h3 className="stat-title">Pending Requests</h3>
-          <p className="stat-value">{stats.pending}</p>
+        
+        <div className="stat-card pending">
+          <div className="stat-title">PENDING REQUESTS</div>
+          <div className="stat-value">{stats.pending}</div>
+          <div className="stat-icon"><i className="fas fa-clock"></i></div>
         </div>
-        <div className="stat-card">
-          <h3 className="stat-title">Approved Requests</h3>
-          <p className="stat-value">{stats.approved}</p>
+        
+        <div className="stat-card approved">
+          <div className="stat-title">APPROVED REQUESTS</div>
+          <div className="stat-value">{stats.approved}</div>
+          <div className="stat-icon"><i className="fas fa-check-circle"></i></div>
         </div>
-        <div className="stat-card">
-          <h3 className="stat-title">Rejected Requests</h3>
-          <p className="stat-value">{stats.rejected}</p>
+        
+        <div className="stat-card rejected">
+          <div className="stat-title">REJECTED REQUESTS</div>
+          <div className="stat-value">{stats.rejected}</div>
+          <div className="stat-icon"><i className="fas fa-times-circle"></i></div>
         </div>
       </div>
 
       <div className="filter-controls">
-        <div className="filter-group">
-          <label className="filter-label">Filter Status</label>
-          <select 
-            value={filter} 
-            onChange={(e) => setFilter(e.target.value)}
-            className="filter-input"
-          >
-            <option value="all">All Requests</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
+        <div className="filter-section-left">
+          <div className="filter-group">
+            <h3 className="filter-heading">Filter By Status</h3>
+            <select 
+              value={filter} 
+              onChange={(e) => setFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Requests</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="used">Used</option>
+              <option value="expired">Expired</option>
+            </select>
+          </div>
         </div>
         
-        <div className="filter-group">
-          <label className="filter-label">Sort By</label>
-          <select 
-            value={sortBy} 
-            onChange={(e) => setSortBy(e.target.value)}
-            className="filter-input"
-          >
-            <option value="createdAt">Date Requested</option>
-            <option value="studentName">Student Name</option>
-            <option value="department">Department</option>
-            <option value="status">Status</option>
-          </select>
-        </div>
-        
-        <div className="filter-group">
-          <label className="filter-label">Sort Order</label>
-          <button 
-            onClick={toggleSortOrder} 
-            className="filter-input"
-            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            {sortOrder === 'asc' ? 'Ascending ↑' : 'Descending ↓'}
-          </button>
-        </div>
-        
-        <div className="filter-group" style={{ flex: 1 }}>
-          <label className="filter-label">Search</label>
-          <input
-            type="text"
-            placeholder="Search by student name or matric number..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="filter-input"
-          />
+        <div className="filter-section-right">
+          <div className="filter-group">
+            <h3 className="filter-heading">Search Requests</h3>
+            <input
+              type="text"
+              placeholder="Search by student name or matric number..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
         </div>
       </div>
 
@@ -238,7 +226,8 @@ const StudentDashboard = ({ exeatRequests, navigate }) => {
     total: exeatRequests.length,
     pending: exeatRequests.filter(req => req.status === 'pending').length,
     approved: exeatRequests.filter(req => req.status === 'approved').length,
-    rejected: exeatRequests.filter(req => req.status === 'rejected').length
+    rejected: exeatRequests.filter(req => req.status === 'rejected').length,
+    expired: exeatRequests.filter(req => req.status === 'expired').length
   };
 
   const handleRowClick = (requestId) => {
@@ -263,20 +252,33 @@ const StudentDashboard = ({ exeatRequests, navigate }) => {
 
       <div className="dashboard-stats">
         <div className="stat-card">
-          <h3 className="stat-title">Total Requests</h3>
-          <p className="stat-value">{stats.total}</p>
+          <div className="stat-title">TOTAL REQUESTS</div>
+          <div className="stat-value">{stats.total}</div>
+          <div className="stat-icon"><i className="fas fa-clipboard-list"></i></div>
         </div>
-        <div className="stat-card">
-          <h3 className="stat-title">Pending Requests</h3>
-          <p className="stat-value">{stats.pending}</p>
+        
+        <div className="stat-card pending">
+          <div className="stat-title">PENDING REQUESTS</div>
+          <div className="stat-value">{stats.pending}</div>
+          <div className="stat-icon"><i className="fas fa-clock"></i></div>
         </div>
-        <div className="stat-card">
-          <h3 className="stat-title">Approved Requests</h3>
-          <p className="stat-value">{stats.approved}</p>
+        
+        <div className="stat-card approved">
+          <div className="stat-title">APPROVED REQUESTS</div>
+          <div className="stat-value">{stats.approved}</div>
+          <div className="stat-icon"><i className="fas fa-check-circle"></i></div>
         </div>
-        <div className="stat-card">
-          <h3 className="stat-title">Rejected</h3>
-          <p className="stat-value">{stats.rejected}</p>
+        
+        <div className="stat-card rejected">
+          <div className="stat-title">REJECTED REQUESTS</div>
+          <div className="stat-value">{stats.rejected}</div>
+          <div className="stat-icon"><i className="fas fa-times-circle"></i></div>
+        </div>
+        
+        <div className="stat-card expired">
+          <div className="stat-title">EXPIRED REQUESTS</div>
+          <div className="stat-value">{stats.expired}</div>
+          <div className="stat-icon"><i className="fas fa-clock"></i></div>
         </div>
       </div>
 
@@ -293,29 +295,20 @@ const StudentDashboard = ({ exeatRequests, navigate }) => {
       ) : (
         <>
           <div className="filter-controls">
-            <div className="filter-group">
-              <label className="filter-label">Sort By</label>
-              <select 
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)}
-                className="filter-input"
-              >
-                <option value="createdAt">Date Requested</option>
-                <option value="departureDate">Departure Date</option>
-                <option value="returnDate">Return Date</option>
-                <option value="status">Status</option>
-              </select>
-            </div>
-            
-            <div className="filter-group">
-              <label className="filter-label">Sort Order</label>
-              <button 
-                onClick={toggleSortOrder} 
-                className="filter-input"
-                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                {sortOrder === 'asc' ? 'Ascending ↑' : 'Descending ↓'}
-              </button>
+            <div className="filter-section-left">
+              <div className="filter-group">
+                <h3 className="filter-heading">Sort Exeat Requests</h3>
+                <select 
+                  value={sortBy} 
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="createdAt">Date Requested</option>
+                  <option value="departureDate">Departure Date</option>
+                  <option value="returnDate">Return Date</option>
+                  <option value="status">Status</option>
+                </select>
+              </div>
             </div>
           </div>
         
@@ -387,6 +380,55 @@ const Dashboard = () => {
   const userString = sessionStorage.getItem('user') || localStorage.getItem('user');
   const [user, setUser] = useState(userString ? JSON.parse(userString) : null);
 
+  // Function to check and update expired exeats
+  const checkExpiredExeats = async (exeats) => {
+    const currentDate = new Date();
+    const expiredExeats = exeats.filter(exeat => 
+      exeat.status === 'approved' && 
+      new Date(exeat.returnDate) < currentDate
+    );
+    
+    // If there are any expired exeats, update them
+    if (expiredExeats.length > 0) {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      
+      try {
+        // Update each expired exeat's status
+        for (const exeat of expiredExeats) {
+          await api.patch(`/api/exeat/${exeat._id}/status`, 
+            { status: 'expired' },
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'x-auth-token': token,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+        }
+        
+        // Fetch updated exeats after marking some as expired
+        const endpoint = user.role === 'admin' ? '/api/exeat' : '/api/exeat/my-requests';
+        const res = await api.get(endpoint, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        return Array.isArray(res.data) ? res.data : [];
+      } catch (err) {
+        console.error('Error updating expired exeats:', err);
+        // Return the original list if update fails
+        return exeats;
+      }
+    }
+    
+    // If no exeats need updating, return the original list
+    return exeats;
+  };
+
   useEffect(() => {
     // If no user is found, redirect to login
     if (!user) {
@@ -424,7 +466,12 @@ const Dashboard = () => {
           }
         });
         
-        setExeatRequests(Array.isArray(res.data) ? res.data : []);
+        let exeats = Array.isArray(res.data) ? res.data : [];
+        
+        // Check for and update expired exeats
+        const updatedExeats = await checkExpiredExeats(exeats);
+        
+        setExeatRequests(updatedExeats);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching exeat requests:', err);
@@ -454,14 +501,6 @@ const Dashboard = () => {
     
     checkServerStatus();
   }, []);
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
 
   if (loading) {
     return <div className="loading">Loading dashboard data...</div>;
@@ -495,9 +534,6 @@ const Dashboard = () => {
               : 'Manage your exeat requests'}
           </p>
         </div>
-        <button onClick={handleLogout} className="action-button primary">
-          Logout
-        </button>
       </div>
 
       {error && (
@@ -547,4 +583,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

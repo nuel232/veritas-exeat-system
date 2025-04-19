@@ -14,6 +14,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+  const [touchedFields, setTouchedFields] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,34 +29,76 @@ const Login = () => {
 
   const { email, password } = formData;
 
+  // Validate a single field
+  const validateField = (name, value) => {
+    let error = '';
+    
+    switch (name) {
+      case 'email':
+        if (!value) {
+          error = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          error = 'Please enter a valid email address';
+        }
+        break;
+      case 'password':
+        if (!value) {
+          error = 'Password is required';
+        } else if (value.length < 6) {
+          error = 'Password must be at least 6 characters';
+        }
+        break;
+      default:
+        break;
+    }
+    
+    return error;
+  };
+
+  // Validate the entire form
   const validateForm = () => {
     const errors = {};
     
-    if (!email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.email = 'Email is invalid';
-    }
-    
-    if (!password) {
-      errors.password = 'Password is required';
-    } else if (password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
+    Object.keys(formData).forEach(key => {
+      const error = validateField(key, formData[key]);
+      if (error) {
+        errors[key] = error;
+      }
+    });
     
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const onChange = e => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    // Clear validation error when user types
-    if (validationErrors[e.target.name]) {
-      setValidationErrors({
-        ...validationErrors,
-        [e.target.name]: ''
-      });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Mark field as touched
+    if (!touchedFields[name]) {
+      setTouchedFields({ ...touchedFields, [name]: true });
     }
+    
+    // Real-time validation
+    const error = validateField(name, value);
+    setValidationErrors({
+      ...validationErrors,
+      [name]: error
+    });
+  };
+
+  const onBlur = e => {
+    const { name, value } = e.target;
+    
+    // Mark field as touched
+    setTouchedFields({ ...touchedFields, [name]: true });
+    
+    // Validate on blur
+    const error = validateField(name, value);
+    setValidationErrors({
+      ...validationErrors,
+      [name]: error
+    });
   };
 
   const togglePasswordVisibility = () => {
@@ -64,6 +107,13 @@ const Login = () => {
 
   const onSubmit = async e => {
     e.preventDefault();
+    
+    // Mark all fields as touched
+    const allTouched = Object.keys(formData).reduce((acc, key) => {
+      acc[key] = true;
+      return acc;
+    }, {});
+    setTouchedFields(allTouched);
     
     if (!validateForm()) return;
     
@@ -77,7 +127,11 @@ const Login = () => {
       });
       sessionStorage.setItem('token', res.data.token);
       sessionStorage.setItem('user', JSON.stringify(res.data.user));
-      navigate('/dashboard');
+      
+      // Show success animation before redirecting
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 300);
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
     } finally {
@@ -95,42 +149,53 @@ const Login = () => {
             <p className="auth-subtitle">{role === 'admin' ? 'Admin Login' : 'Student Login'}</p>
           </div>
 
-          <form onSubmit={onSubmit} className="auth-form">
+          <form onSubmit={onSubmit} className="auth-form" noValidate>
             {error && (
-              <div className="alert alert-danger">
+              <div className="alert alert-danger" role="alert">
                 {error}
               </div>
             )}
 
             <div className="form-group">
-              <label className="form-label">Email Address</label>
+              <label htmlFor="email" className="form-label">Email Address</label>
               <input
+                id="email"
                 type="email"
                 name="email"
                 value={email}
                 onChange={onChange}
-                required
-                className={`form-input ${validationErrors.email ? 'error' : ''}`}
+                onBlur={onBlur}
+                className={`form-input ${touchedFields.email && validationErrors.email ? 'error' : ''}`}
                 placeholder="Enter your email"
+                aria-invalid={touchedFields.email && validationErrors.email ? 'true' : 'false'}
+                aria-describedby={validationErrors.email ? 'email-error' : undefined}
+                autoComplete="email"
               />
-              {validationErrors.email && <span className="form-error">{validationErrors.email}</span>}
+              {touchedFields.email && validationErrors.email && (
+                <span className="form-error" id="email-error">{validationErrors.email}</span>
+              )}
             </div>
 
             <div className="form-group">
-              <label className="form-label">Password</label>
+              <label htmlFor="password" className="form-label">Password</label>
               <div className="form-icon">
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   name="password"
                   value={password}
                   onChange={onChange}
-                  required
-                  className={`form-input ${validationErrors.password ? 'error' : ''}`}
+                  onBlur={onBlur}
+                  className={`form-input ${touchedFields.password && validationErrors.password ? 'error' : ''}`}
                   placeholder="Enter your password"
+                  aria-invalid={touchedFields.password && validationErrors.password ? 'true' : 'false'}
+                  aria-describedby={validationErrors.password ? 'password-error' : undefined}
+                  autoComplete="current-password"
                 />
                 <span 
                   className="form-icon-right" 
                   onClick={togglePasswordVisibility}
+                  onKeyDown={(e) => e.key === 'Enter' && togglePasswordVisibility()}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   role="button"
                   tabIndex="0"
@@ -138,13 +203,16 @@ const Login = () => {
                   {showPassword ? "👁️" : "👁️‍🗨️"}
                 </span>
               </div>
-              {validationErrors.password && <span className="form-error">{validationErrors.password}</span>}
+              {touchedFields.password && validationErrors.password && (
+                <span className="form-error" id="password-error">{validationErrors.password}</span>
+              )}
             </div>
 
             <button 
               type="submit" 
-              className="btn btn-primary auth-button"
+              className={`auth-button ${isLoading ? 'loading' : ''}`}
               disabled={isLoading}
+              aria-busy={isLoading}
             >
               {isLoading ? 'Logging in...' : 'Login'}
             </button>
