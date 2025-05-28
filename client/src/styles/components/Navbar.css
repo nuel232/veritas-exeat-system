@@ -1,7 +1,7 @@
 .navbar {
   background-color: var(--color-white);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 12px 15px;
+  padding: 4px 6px;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -28,13 +28,13 @@
 }
 
 .navbar-logo-img {
-  height: 40px;
+  height: 24px;
   width: auto;
-  margin-right: 12px;
+  margin-right: 6px;
 }
 
 .navbar-title {
-  font-size: var(--font-size-lg);
+  font-size: 1rem;
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
   white-space: nowrap;
@@ -43,7 +43,7 @@
 .navbar-menu {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 8px;
 }
 
 .navbar-user {
@@ -53,26 +53,26 @@
 }
 
 .username {
-  font-size: var(--font-size-base);
+  font-size: 0.9rem;
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
 }
 
 .navbar-role {
-  font-size: var(--font-size-xs);
+  font-size: 0.7rem;
   color: var(--color-text-secondary);
 }
 
 .logout-button {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 4px 8px;
   background-color: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--border-radius-md);
   cursor: pointer;
-  font-size: var(--font-size-small);
+  font-size: 0.8rem;
   font-weight: var(--font-weight-medium);
   transition: all 0.3s ease;
 }
@@ -92,10 +92,10 @@
   background: none;
   border: none;
   color: var(--color-primary);
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  padding: 5px;
-  margin-right: 5px;
+  padding: 2px;
+  margin-right: 2px;
 }
 
 .mobile-menu {
@@ -106,7 +106,7 @@
   right: 0;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 15px;
+  padding: 6px;
   flex-direction: column;
   z-index: 999;
   animation: slideDown 0.3s ease-out;
@@ -128,13 +128,14 @@
 }
 
 .mobile-menu-item {
-  padding: 12px 15px;
+  padding: 6px 8px;
   border-bottom: 1px solid #f1f1f1;
   color: var(--color-text);
   text-decoration: none;
   display: flex;
   align-items: center;
   font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .mobile-menu-item i {
@@ -147,8 +148,8 @@
 }
 
 .mobile-logout-button {
-  margin-top: 10px;
-  padding: 12px;
+  margin-top: 4px;
+  padding: 6px;
   background-color: var(--color-primary);
   color: white;
   border: none;
@@ -159,6 +160,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.9rem;
 }
 
 .mobile-logout-button i {
@@ -168,19 +170,19 @@
 .mobile-user-info {
   display: flex;
   flex-direction: column;
-  padding: 10px 15px 20px;
+  padding: 4px 8px 8px;
   border-bottom: 1px solid #f1f1f1;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .mobile-user-info .username {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 4px;
 }
 
 .mobile-user-info .navbar-role {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   color: #666;
 }
 

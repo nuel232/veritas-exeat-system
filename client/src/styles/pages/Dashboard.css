@@ -4,33 +4,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 .dashboard {
-  padding: 40px;
+  padding: 2.5rem;
   min-height: calc(100vh - 64px); /* Account for navbar height */
   background-color: var(--color-background);
   background-image: linear-gradient(to bottom right, rgba(59, 130, 246, 0.03), rgba(79, 70, 229, 0.02));
 }
 
 .dashboard-container {
-  padding: 40px;
-  max-width: 1200px;
+  padding: 20px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
 .dashboard-header {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   position: relative;
 }
 
 .dashboard-header h1 {
-  font-size: 2.2rem;
+  font-size: 1.5rem;
   color: #333;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .dashboard-header p {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #666;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 .dashboard-header::after {
@@ -71,8 +71,8 @@
   background-color: var(--color-white);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
-  padding: var(--spacing-6);
-  margin-bottom: var(--spacing-6);
+  padding: 2.5rem;
+  margin-bottom: var(--spacing-3);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -110,15 +110,15 @@
 /* Stats Cards */
 .dashboard-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 25px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
   background-color: var(--color-white);
   border-radius: var(--border-radius-lg);
-  padding: var(--spacing-5);
+  padding: var(--spacing-3);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-light);
   transition: var(--transition-transform), var(--transition-shadow);
@@ -202,16 +202,16 @@
 }
 
 .stat-title {
-  font-size: var(--font-size-sm);
+  font-size: 0.85rem;
   color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-2);
+  margin-bottom: var(--spacing-1);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wider);
   font-weight: var(--font-weight-medium);
 }
 
 .stat-value {
-  font-size: var(--font-size-4xl);
+  font-size: 1.5rem;
   font-weight: var(--font-weight-bold);
   color: var(--color-text);
   margin: 0 0 var(--spacing-1) 0;
@@ -237,8 +237,8 @@
 .filter-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2.5rem;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
   align-items: center;
   justify-content: space-between;
 }
@@ -268,12 +268,12 @@
 }
 
 .filter-select {
-  width: 220px;
-  padding: 0.6rem 2.2rem 0.6rem 1.2rem;
+  width: 160px;
+  padding: 0.4rem 1.2rem 0.4rem 0.8rem;
   background-color: white;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: #1e293b;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -306,12 +306,12 @@
 }
 
 .search-input {
-  width: 320px;
-  padding: 0.6rem 1.2rem 0.6rem 2.5rem;
+  width: 200px;
+  padding: 0.4rem 0.8rem 0.4rem 1.5rem;
   background-color: white;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: #1e293b;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -423,9 +423,9 @@
 
 .dashboard-table th,
 .dashboard-table td {
-  padding: 1.1rem 1.3rem;
+  padding: 0.7rem 0.8rem;
   text-align: left;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -486,11 +486,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
-  min-width: 110px;
-  height: 36px;
+  padding: 0.3rem 0.7rem;
+  min-width: 80px;
+  height: 26px;
   border-radius: 36px;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: capitalize;
   letter-spacing: 0.02em;
@@ -574,10 +574,10 @@
 
 /* Action Buttons */
 .action-button {
-  padding: 0.6rem 1.1rem;
+  padding: 0.4rem 0.7rem;
   border: none;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -625,11 +625,11 @@
 /* Empty State */
 .empty-state {
   text-align: center;
-  padding: var(--spacing-12) var(--spacing-8);
+  padding: var(--spacing-6) var(--spacing-3);
   color: var(--color-text-secondary);
   background-color: rgba(0, 0, 0, 0.02);
   border-radius: var(--border-radius-lg);
-  margin: var(--spacing-6) 0;
+  margin: var(--spacing-3) 0;
   border: 1px dashed var(--color-border);
 }
 
