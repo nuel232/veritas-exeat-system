@@ -3,63 +3,62 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const app = require('./app');
 
 // Load environment variables
 dotenv.config();
 
 // Create Express app
-const app = express();
+const appExpress = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+appExpress.use(cors());
+appExpress.use(express.json());
+appExpress.use(express.urlencoded({ extended: true }));
 
 // Database connection with detailed logging
 console.log('Attempting to connect to MongoDB...');
 console.log('MongoDB URI:', process.env.MONGODB_URI);
 
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Successfully connected to MongoDB.');
-    console.log('Database name:', mongoose.connection.name);
-    console.log('Database host:', mongoose.connection.host);
-    console.log('Database port:', mongoose.connection.port);
-  })
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-    console.error('Error details:', {
-      name: err.name,
-      message: err.message,
-      code: err.code
-    });
+// Set default port
+const PORT = process.env.PORT || 5000;
+
+// Connect to database
+const connectDB = async () => {
+  try {
+    const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/exeat_system';
+    console.log(`Connecting to MongoDB at: ${dbUri}`);
+    
+    await mongoose.connect(dbUri);
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1);
+  }
+};
+
+// Connect to database and start server
+connectDB().then(() => {
+  appExpress.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log('Environment:', process.env.NODE_ENV);
   });
-
-// Monitor MongoDB connection
-mongoose.connection.on('connected', () => {
-  console.log('Mongoose connected to MongoDB');
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('Mongoose connection error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('Mongoose disconnected from MongoDB');
 });
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/exeat', require('./routes/exeat'));
-app.use('/api/admin', require('./routes/admin'));
+appExpress.use('/api/auth', require('./routes/auth'));
+appExpress.use('/api/exeat', require('./routes/exeat'));
+appExpress.use('/api/admin', require('./routes/admin'));
+appExpress.use('/api/notifications', require('./routes/notifications'));
+appExpress.use('/api/verify', require('./routes/verify'));
 
 // Test route to verify server is running
-app.get('/api/test', (req, res) => {
+appExpress.get('/api/test', (req, res) => {
   res.json({ message: 'Server is running correctly' });
 });
 
 // Test route to verify database connection
-app.get('/api/test/db', async (req, res) => {
+appExpress.get('/api/test/db', async (req, res) => {
   try {
     // Check if we can perform a simple operation
     const collections = await mongoose.connection.db.listCollections().toArray();
@@ -78,22 +77,56 @@ app.get('/api/test/db', async (req, res) => {
   }
 });
 
+// Public route for QR code verification (no auth required)
+appExpress.get('/verify/:exeatId', async (req, res) => {
+  try {
+    const exeatId = req.params.exeatId;
+    const exeat = await mongoose.model('ExeatRequest').findById(exeatId)
+      .populate('student', 'firstName lastName matricNumber department')
+      .select('status departureDate returnDate checkIn checkOut');
+    
+    if (!exeat) {
+      return res.status(404).json({ message: 'Exeat not found' });
+    }
+    
+    res.json({
+      status: exeat.status,
+      studentName: `${exeat.student.firstName} ${exeat.student.lastName}`,
+      matricNumber: exeat.student.matricNumber,
+      department: exeat.student.department,
+      departureDate: exeat.departureDate,
+      returnDate: exeat.returnDate,
+      checkedOut: exeat.checkOut.status,
+      checkedIn: exeat.checkIn.status
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Error verifying exeat', error: err.message });
+  }
+});
+
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/build'));
-  app.get('*', (req, res) => {
+  appExpress.use(express.static('client/build'));
+  appExpress.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
   });
 }
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+appExpress.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log('Environment:', process.env.NODE_ENV);
+// Monitor MongoDB connection
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('Mongoose connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected from MongoDB');
 }); 

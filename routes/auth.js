@@ -12,10 +12,10 @@ router.post('/register', [
   body('lastName').notEmpty().withMessage('Last name is required'),
   body('email').isEmail().withMessage('Please enter a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-  body('role').isIn(['student', 'admin', 'staff']).withMessage('Invalid role'),
+  body('role').isIn(['student', 'parent', 'dean', 'security', 'staff']).withMessage('Invalid role'),
   body('phoneNumber').notEmpty().withMessage('Phone number is required'),
   
-  // Conditional validation based on role
+  // Student-specific validations
   body('department').custom((value, { req }) => {
     if (req.body.role === 'student' && !value) {
       throw new Error('Department is required for students');
@@ -28,15 +28,61 @@ router.post('/register', [
     }
     return true;
   }),
+  body('gender').custom((value, { req }) => {
+    if (req.body.role === 'student' && !value) {
+      throw new Error('Gender is required for students');
+    }
+    if (req.body.role === 'student' && !['male', 'female'].includes(value)) {
+      throw new Error('Gender must be either male or female');
+    }
+    return true;
+  }),
+  body('parentEmail').custom((value, { req }) => {
+    if (req.body.role === 'student' && !value) {
+      throw new Error('Parent email is required for students');
+    }
+    if (req.body.role === 'student' && !/\S+@\S+\.\S+/.test(value)) {
+      throw new Error('Please enter a valid parent email');
+    }
+    return true;
+  }),
+  
+  // Staff/Dean/Security validations
   body('office').custom((value, { req }) => {
-    if (['admin', 'staff'].includes(req.body.role) && !value) {
-      throw new Error('Office is required for admin/staff');
+    if (['staff', 'dean', 'security'].includes(req.body.role) && !value) {
+      throw new Error('Office is required for staff, dean, and security roles');
     }
     return true;
   }),
   body('staffId').custom((value, { req }) => {
-    if (['admin', 'staff'].includes(req.body.role) && !value) {
-      throw new Error('Staff ID is required for admin/staff');
+    if (['staff', 'dean', 'security'].includes(req.body.role) && !value) {
+      throw new Error('Staff ID is required for staff, dean, and security roles');
+    }
+    return true;
+  }),
+  body('staffType').custom((value, { req }) => {
+    if (['staff', 'dean', 'security'].includes(req.body.role) && !value) {
+      throw new Error('Staff type is required for staff, dean, and security roles');
+    }
+    const validStaffTypes = ['father', 'sister', 'hostel_admin', 'dean', 'security_guard'];
+    if (['staff', 'dean', 'security'].includes(req.body.role) && !validStaffTypes.includes(value)) {
+      throw new Error('Invalid staff type');
+    }
+    return true;
+  }),
+  
+  // Parent-specific validations
+  body('children').custom((value, { req }) => {
+    if (req.body.role === 'parent') {
+      if (!value || !Array.isArray(value) || value.length === 0) {
+        throw new Error('At least one child is required for parent accounts');
+      }
+      // Validate each child object
+      for (const child of value) {
+        if (!child.matricNumber || !child.firstName || !child.lastName) {
+          throw new Error('Each child must have matricNumber, firstName, and lastName');
+        }
+      }
     }
     return true;
   })
@@ -55,6 +101,46 @@ router.post('/register', [
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // For students, check if matricNumber is already taken
+    if (req.body.role === 'student') {
+      const existingStudent = await User.findOne({ matricNumber: req.body.matricNumber });
+      if (existingStudent) {
+        return res.status(400).json({ message: 'Matric number already exists' });
+      }
+    }
+
+    // For staff/dean/security, check if staffId is already taken
+    if (['staff', 'dean', 'security'].includes(req.body.role)) {
+      const existingStaff = await User.findOne({ staffId: req.body.staffId });
+      if (existingStaff) {
+        return res.status(400).json({ message: 'Staff ID already exists' });
+      }
+    }
+
+    // For parent registration, verify that the children exist as students
+    if (req.body.role === 'parent' && req.body.children) {
+      const matricNumbers = req.body.children.map(child => child.matricNumber);
+      const existingStudents = await User.find({ 
+        matricNumber: { $in: matricNumbers },
+        role: 'student'
+      });
+      
+      if (existingStudents.length !== matricNumbers.length) {
+        return res.status(400).json({ 
+          message: 'One or more students not found with the provided matric numbers' 
+        });
+      }
+
+      // Update the children array with actual student IDs
+      req.body.children = req.body.children.map(child => {
+        const student = existingStudents.find(s => s.matricNumber === child.matricNumber);
+        return {
+          ...child,
+          studentId: student._id
+        };
+      });
+    }
+
     // Create new user
     user = new User(req.body);
     await user.save();
@@ -66,21 +152,17 @@ router.post('/register', [
       { expiresIn: '24h' }
     );
 
+    // Remove password from response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
     res.status(201).json({
       token,
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-        office: user.office,
-        staffId: user.staffId
-      }
+      user: userResponse
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Server error during registration' });
   }
 });
 
@@ -137,6 +219,55 @@ router.post('/login', [
     });
   } catch (error) {
     console.error('Error in login:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get current user
+router.get('/me', async (req, res) => {
+  try {
+    const token = req.header('x-auth-token') || req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No token, authorization denied' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select('-password');
+
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error in get user:', error.message);
+    res.status(401).json({ message: 'Token is not valid' });
+  }
+});
+
+// Parent approval route (for tokenized email links)
+router.get('/parent-approval/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    
+    // Find user with this approval token
+    const parent = await User.findOne({ approvalToken: token });
+    
+    if (!parent) {
+      return res.status(400).json({ message: 'Invalid or expired approval token' });
+    }
+
+    // Return parent info for approval interface
+    res.json({
+      parentId: parent._id,
+      firstName: parent.firstName,
+      lastName: parent.lastName,
+      email: parent.email,
+      children: parent.children
+    });
+  } catch (error) {
+    console.error('Error in parent approval:', error.message);
     res.status(500).json({ message: 'Server error' });
   }
 });

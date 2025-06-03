@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  GraduationCap, 
+  Users, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  Plus,
+  QrCode,
+  Shield,
+  BookOpen,
+  User,
+  Eye,
+  Calendar,
+  MapPin,
+  AlertCircle
+} from 'lucide-react';
 import api from '../../utils/api';
 import '../../styles/pages/Dashboard.css';
 
