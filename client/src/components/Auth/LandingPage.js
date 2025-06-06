@@ -42,7 +42,7 @@ const LandingPage = () => {
               >
                 Get Started
               </Link>
-            </div>
+        </div>
           </div>
         </div>
       </header>
@@ -72,7 +72,7 @@ const LandingPage = () => {
                   <span>Student Portal</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                
+          
                 <Link 
                   to="/register?role=staff" 
                   className="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold flex items-center space-x-2 transition-all hover:shadow-lg transform hover:-translate-y-0.5"
@@ -101,16 +101,16 @@ const LandingPage = () => {
                   >
                     <BookOpen className="w-6 h-6 text-gray-600 group-hover:text-blue-600 mb-2" />
                     <span className="text-sm font-medium text-gray-700">Dean</span>
-                  </Link>
-                  
+            </Link>
+            
                   <Link 
                     to="/login?role=security" 
                     className="flex flex-col items-center p-4 bg-white rounded-lg border hover:border-blue-200 hover:shadow-md transition-all group"
                   >
                     <Shield className="w-6 h-6 text-gray-600 group-hover:text-blue-600 mb-2" />
                     <span className="text-sm font-medium text-gray-700">Security</span>
-                  </Link>
-                  
+            </Link>
+            
                   <Link 
                     to="/login?role=staff" 
                     className="flex flex-col items-center p-4 bg-white rounded-lg border hover:border-blue-200 hover:shadow-md transition-all group"
@@ -237,8 +237,8 @@ const LandingPage = () => {
             <p className="text-sm text-gray-400">
               © 2024 Veritas University. All rights reserved.
             </p>
-          </div>
         </div>
+      </div>
       </footer>
     </div>
   );
