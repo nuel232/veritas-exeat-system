@@ -9,7 +9,6 @@ import ParentApproval from './components/Parent/ParentApproval';
 import QRScanner from './components/Security/QRScanner';
 import Navbar from './components/Layout/Navbar';
 import LandingPage from './components/Auth/LandingPage';
-import './styles/variables.css';
 
 const PrivateRoute = ({ children }) => {
   const token = sessionStorage.getItem('token');
