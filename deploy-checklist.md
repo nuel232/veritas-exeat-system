@@ -7,7 +7,7 @@ Before deploying, you MUST set these environment variables in your Elastic Beans
 
 ```bash
 # Required for database connection
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/exeat_system
+MONGODB_URI=your_mongodb_connection_string_here
 
 # Required for JWT authentication
 JWT_SECRET=your_super_secure_jwt_secret_key_here
