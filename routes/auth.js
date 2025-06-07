@@ -272,4 +272,33 @@ router.get('/parent-approval/:token', async (req, res) => {
   }
 });
 
+// Search students endpoint for parent registration
+router.get('/search-students', async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query || query.length < 2) {
+      return res.json({ students: [] });
+    }
+
+    // Search for students by firstName, lastName, or matricNumber
+    const students = await User.find({
+      role: 'student',
+      $or: [
+        { firstName: { $regex: query, $options: 'i' } },
+        { lastName: { $regex: query, $options: 'i' } },
+        { matricNumber: { $regex: query, $options: 'i' } }
+      ]
+    })
+    .select('firstName lastName matricNumber department')
+    .limit(10)
+    .sort({ firstName: 1, lastName: 1 });
+
+    res.json({ students });
+  } catch (error) {
+    console.error('Error searching students:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router; 

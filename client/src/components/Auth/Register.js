@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   Eye, 
@@ -47,6 +47,15 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Student search states for parent role
+  const [studentSearchResults, setStudentSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [activeSearchIndex, setActiveSearchIndex] = useState(-1);
+  const [showSearchResults, setShowSearchResults] = useState({});
+  
+  // Ref for search dropdown to handle click outside
+  const searchDropdownRefs = useRef({});
 
   // Update role when URL param changes
   useEffect(() => {
@@ -54,6 +63,23 @@ const Register = () => {
     setSelectedRole(role);
     setFormData(prev => ({ ...prev, role }));
   }, [searchParams]);
+
+  // Handle click outside to close search results
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      Object.keys(showSearchResults).forEach(index => {
+        const dropdownRef = searchDropdownRefs.current[index];
+        if (dropdownRef && !dropdownRef.contains(event.target) && showSearchResults[index]) {
+          setShowSearchResults(prev => ({ ...prev, [index]: false }));
+        }
+      });
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSearchResults]);
 
   const roles = [
     { id: 'student', name: 'Student', icon: GraduationCap, color: '#2F54EB' },
@@ -80,7 +106,7 @@ const Register = () => {
     setSelectedRole(role);
     setFormData(prev => ({
       ...prev,
-      role,
+    role,
       // Reset role-specific fields when changing roles
       department: '',
       matricNumber: '',
@@ -98,7 +124,7 @@ const Register = () => {
   const addChild = () => {
     setFormData(prev => ({
       ...prev,
-      children: [...prev.children, { matricNumber: '', firstName: '', lastName: '' }]
+      children: [...prev.children, { matricNumber: '', firstName: '', lastName: '', searchQuery: '' }]
     }));
   };
 
@@ -116,6 +142,79 @@ const Register = () => {
         i === index ? { ...child, [field]: value } : child
       )
     }));
+    
+    // Trigger search when user types in search field
+    if (field === 'searchQuery' && value.length >= 2) {
+      searchStudents(value, index);
+    } else if (field === 'searchQuery' && value.length < 2) {
+      setShowSearchResults(prev => ({ ...prev, [index]: false }));
+      setStudentSearchResults([]);
+    }
+  };
+
+  // Search for students
+  const searchStudents = async (query, childIndex) => {
+    if (query.length < 2) return;
+    
+    setIsSearching(true);
+    try {
+      const response = await api.get(`/api/auth/search-students?query=${encodeURIComponent(query)}`);
+      setStudentSearchResults(response.data.students || []);
+      setShowSearchResults(prev => ({ ...prev, [childIndex]: true }));
+      setActiveSearchIndex(-1);
+    } catch (error) {
+      console.error('Error searching students:', error);
+      setStudentSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Select a student from search results
+  const selectStudent = (student, childIndex) => {
+    setFormData(prev => ({
+      ...prev,
+      children: prev.children.map((child, i) => 
+        i === childIndex ? {
+          matricNumber: student.matricNumber,
+          firstName: student.firstName,
+          lastName: student.lastName,
+          searchQuery: `${student.firstName} ${student.lastName} (${student.matricNumber})`
+        } : child
+      )
+    }));
+    setShowSearchResults(prev => ({ ...prev, [childIndex]: false }));
+    setStudentSearchResults([]);
+  };
+
+  // Handle keyboard navigation in search results
+  const handleSearchKeyDown = (e, childIndex) => {
+    if (!showSearchResults[childIndex] || studentSearchResults.length === 0) return;
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setActiveSearchIndex(prev => 
+          prev < studentSearchResults.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setActiveSearchIndex(prev => 
+          prev > 0 ? prev - 1 : studentSearchResults.length - 1
+        );
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (activeSearchIndex >= 0 && activeSearchIndex < studentSearchResults.length) {
+          selectStudent(studentSearchResults[activeSearchIndex], childIndex);
+        }
+        break;
+      case 'Escape':
+        setShowSearchResults(prev => ({ ...prev, [childIndex]: false }));
+        setActiveSearchIndex(-1);
+        break;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -124,6 +223,26 @@ const Register = () => {
     setError('');
 
     try {
+      // Additional validation for parent role
+      if (selectedRole === 'parent') {
+        if (formData.children.length === 0) {
+          setError('Please add at least one child');
+          setLoading(false);
+          return;
+        }
+        
+        // Check if all children have valid data (from search results)
+        const invalidChildren = formData.children.filter(child => 
+          !child.matricNumber || !child.firstName || !child.lastName
+        );
+        
+        if (invalidChildren.length > 0) {
+          setError('Please select valid students from the search results for all children');
+          setLoading(false);
+          return;
+        }
+      }
+
       const response = await api.post('/api/auth/register', formData);
       sessionStorage.setItem('token', response.data.token);
       sessionStorage.setItem('user', JSON.stringify(response.data.user));
@@ -138,7 +257,7 @@ const Register = () => {
   const renderRoleSpecificFields = () => {
     switch (selectedRole) {
       case 'student':
-        return (
+  return (
           <>
             <div className="input-row">
               <div className="input-group">
@@ -189,7 +308,7 @@ const Register = () => {
               
               <div className="input-group">
                 <label htmlFor="parentEmail" className="input-label">Parent Email</label>
-                <input
+              <input
                   id="parentEmail"
                   name="parentEmail"
                   type="email"
@@ -247,6 +366,56 @@ const Register = () => {
                 </div>
                 
                 <div className="child-inputs">
+                  <div 
+                    className="search-input-wrapper"
+                    ref={el => searchDropdownRefs.current[index] = el}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Search by name or matric number..."
+                      value={child.searchQuery || ''}
+                      onChange={(e) => updateChild(index, 'searchQuery', e.target.value)}
+                      onKeyDown={(e) => handleSearchKeyDown(e, index)}
+                      className="form-input search-input"
+                      autoComplete="off"
+                    />
+                    {isSearching && (
+                      <div className="search-loading">
+                        <Loader size={16} className="loading-icon" />
+                      </div>
+                    )}
+                    
+                    {showSearchResults[index] && studentSearchResults.length > 0 && (
+                      <div className="search-results-dropdown">
+                        {studentSearchResults.map((student, resultIndex) => (
+                          <div
+                            key={student._id}
+                            className={`search-result-item ${resultIndex === activeSearchIndex ? 'active' : ''}`}
+                            onClick={() => selectStudent(student, index)}
+                            onMouseEnter={() => setActiveSearchIndex(resultIndex)}
+                          >
+                            <div className="student-info">
+                              <div className="student-name">
+                                {student.firstName} {student.lastName}
+                              </div>
+                              <div className="student-details">
+                                {student.matricNumber} • {student.department}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {showSearchResults[index] && child.searchQuery && child.searchQuery.length >= 2 && studentSearchResults.length === 0 && !isSearching && (
+                      <div className="search-results-dropdown">
+                        <div className="no-results">
+                          No students found matching "{child.searchQuery}"
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
                   <input
                     type="text"
                     placeholder="Matric Number"
@@ -254,6 +423,7 @@ const Register = () => {
                     onChange={(e) => updateChild(index, 'matricNumber', e.target.value)}
                     className="form-input"
                     required
+                    readOnly
                   />
                   <input
                     type="text"
@@ -262,16 +432,18 @@ const Register = () => {
                     onChange={(e) => updateChild(index, 'firstName', e.target.value)}
                     className="form-input"
                     required
+                    readOnly
                   />
-                  <input
+              <input
                     type="text"
                     placeholder="Last Name"
                     value={child.lastName}
                     onChange={(e) => updateChild(index, 'lastName', e.target.value)}
                     className="form-input"
-                    required
-                  />
-                </div>
+                required
+                    readOnly
+              />
+            </div>
               </div>
             ))}
           </div>
@@ -285,30 +457,30 @@ const Register = () => {
             <div className="input-row">
               <div className="input-group">
                 <label htmlFor="office" className="input-label">Office/Department</label>
-                <input
+              <input
                   id="office"
                   name="office"
-                  type="text"
+                type="text"
                   required
-                  value={formData.office}
-                  onChange={handleInputChange}
+                value={formData.office}
+                onChange={handleInputChange}
                   className="form-input"
-                  placeholder="e.g., Academic Affairs, Security Office"
-                />
-              </div>
+                placeholder="e.g., Academic Affairs, Security Office"
+              />
+            </div>
 
               <div className="input-group">
                 <label htmlFor="staffId" className="input-label">Staff ID</label>
-                <input
+              <input
                   id="staffId"
                   name="staffId"
-                  type="text"
+                type="text"
                   required
-                  value={formData.staffId}
-                  onChange={handleInputChange}
+                value={formData.staffId}
+                onChange={handleInputChange}
                   className="form-input"
-                  placeholder="e.g., ST/2024/001"
-                />
+                placeholder="e.g., ST/2024/001"
+              />
               </div>
             </div>
 
@@ -358,7 +530,7 @@ const Register = () => {
           <div className="header-section">
             <h1 className="welcome-heading">Join Veritas Exeat System</h1>
             <p className="welcome-subtitle">Create your account to get started with the university exeat management system</p>
-          </div>
+        </div>
 
           {/* Role Selection */}
           <div className="role-selection">
@@ -385,11 +557,11 @@ const Register = () => {
           </div>
 
           {/* Error Display */}
-          {error && (
+            {error && (
             <div className="error-message">
               {error}
-            </div>
-          )}
+              </div>
+            )}
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="register-form">
@@ -417,7 +589,7 @@ const Register = () => {
                 
                 <div className="input-group">
                   <label htmlFor="lastName" className="input-label">Last Name</label>
-                  <input
+              <input
                     id="lastName"
                     name="lastName"
                     type="text"
@@ -433,30 +605,30 @@ const Register = () => {
               <div className="input-row">
                 <div className="input-group">
                   <label htmlFor="email" className="input-label">Email Address</label>
-                  <input
+                    <input
                     id="email"
                     name="email"
-                    type="email"
+                      type="email"
                     required
-                    value={formData.email}
-                    onChange={handleInputChange}
+                      value={formData.email}
+                      onChange={handleInputChange}
                     className="form-input"
-                    placeholder="your.email@example.com"
-                  />
+                      placeholder="your.email@example.com"
+                    />
                 </div>
                 
                 <div className="input-group">
                   <label htmlFor="phoneNumber" className="input-label">Phone Number</label>
-                  <input
+                    <input
                     id="phoneNumber"
                     name="phoneNumber"
-                    type="tel"
+                      type="tel"
                     required
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
+                      value={formData.phoneNumber}
+                      onChange={handleInputChange}
                     className="form-input"
-                    placeholder="+234 xxx xxx xxxx"
-                  />
+                      placeholder="+234 xxx xxx xxxx"
+                    />
                 </div>
               </div>
 
@@ -473,7 +645,7 @@ const Register = () => {
                     onChange={handleInputChange}
                     className="form-input password-input"
                     placeholder="At least 6 characters"
-                  />
+              />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -500,19 +672,19 @@ const Register = () => {
             )}
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
-              disabled={loading}
+              <button
+                type="submit"
+                disabled={loading}
               className={`register-button ${loading ? 'loading' : ''}`}
-            >
-              {loading ? (
+              >
+                {loading ? (
                 <>
                   <Loader className="loading-icon" size={20} />
-                  Creating Account...
+                    Creating Account...
                 </>
-              ) : (
-                'Create Account'
-              )}
+                ) : (
+                  'Create Account'
+                )}
             </button>
           </form>
 
@@ -522,9 +694,9 @@ const Register = () => {
               Already have an account? <Link to="/login" className="signin-link">Sign In</Link>
             </p>
             <Link to="/" className="back-home-link">
-              ← Back to Home
-            </Link>
-          </div>
+                ← Back to Home
+              </Link>
+            </div>
         </div>
       </div>
     </div>
