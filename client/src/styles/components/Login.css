@@ -1,1 +1,397 @@
- 
+/* ===== Login Page Styles ===== */
+
+/* Main Page Container */
+.login-page {
+  min-height: 100vh;
+  background: #f7f9fc;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(47, 84, 235, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(47, 84, 235, 0.08) 0%, transparent 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Login Container */
+.login-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Login Card */
+.login-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 48px 40px;
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Logo Section */
+.logo-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.university-logo {
+  width: 120px;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Header Section */
+.header-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.welcome-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.welcome-subtitle {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Error Message */
+.error-message {
+  background: #fed7d7;
+  border: 1px solid #feb2b2;
+  color: #c53030;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Form Styles */
+.login-form {
+  margin-bottom: 32px;
+}
+
+.input-group {
+  margin-bottom: 24px;
+}
+
+.input-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1a202c;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #2F54EB;
+  box-shadow: 0 0 0 3px rgba(47, 84, 235, 0.1);
+  transform: translateY(-1px);
+}
+
+.form-input::placeholder {
+  color: #a0aec0;
+  font-size: 16px;
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  padding-right: 50px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.password-toggle-btn:hover {
+  color: #2F54EB;
+  background: rgba(47, 84, 235, 0.1);
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+  color: #2F54EB;
+  box-shadow: 0 0 0 2px rgba(47, 84, 235, 0.2);
+}
+
+/* Forgot Password Section */
+.forgot-password-section {
+  text-align: right;
+  margin-bottom: 32px;
+}
+
+.forgot-password-link {
+  font-size: 14px;
+  color: #2F54EB;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.forgot-password-link:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+/* Sign In Button */
+.signin-button {
+  width: 100%;
+  background: #2F54EB;
+  color: #ffffff;
+  border: none;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.signin-button:hover:not(:disabled) {
+  background: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 10px 15px -3px rgba(47, 84, 235, 0.2);
+}
+
+.signin-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 1px 2px -1px rgba(0, 0, 0, 0.06);
+}
+
+.signin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.signin-button.loading {
+  pointer-events: none;
+}
+
+.loading-icon {
+  animation: spin 1s linear infinite;
+}
+
+/* Footer Section */
+.footer-section {
+  text-align: center;
+  margin-top: 32px;
+}
+
+.signup-text {
+  font-size: 14px;
+  color: #718096;
+  margin: 0 0 16px 0;
+}
+
+.signup-link {
+  color: #2F54EB;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.signup-link:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+.back-home-link {
+  font-size: 14px;
+  color: #a0aec0;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+}
+
+.back-home-link:hover {
+  color: #718096;
+  text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .login-page {
+    padding: 16px;
+  }
+  
+  .login-card {
+    padding: 32px 24px;
+    border-radius: 12px;
+  }
+  
+  .welcome-heading {
+    font-size: 24px;
+    line-height: 1.3;
+  }
+  
+  .welcome-subtitle {
+    font-size: 15px;
+  }
+  
+  .university-logo {
+    width: 100px;
+  }
+  
+  .form-input {
+    padding: 14px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .signin-button {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 24px 20px;
+  }
+  
+  .welcome-heading {
+    font-size: 22px;
+  }
+  
+  .university-logo {
+    width: 90px;
+  }
+}
+
+/* Focus and accessibility improvements */
+.form-input:focus,
+.password-toggle-btn:focus,
+.signin-button:focus,
+.forgot-password-link:focus,
+.signup-link:focus,
+.back-home-link:focus {
+  outline: 2px solid #2F54EB;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .login-card {
+    border: 2px solid #000000;
+  }
+  
+  .form-input {
+    border-width: 2px;
+  }
+  
+  .signin-button {
+    border: 2px solid #000000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .login-card,
+  .form-input,
+  .signin-button,
+  .password-toggle-btn,
+  .forgot-password-link,
+  .signup-link,
+  .back-home-link {
+    animation: none;
+    transition: none;
+  }
+  
+  .signin-button:hover:not(:disabled) {
+    transform: none;
+  }
+  
+  .loading-icon {
+    animation: none;
+  }
+} 
