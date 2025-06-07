@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
+  Eye, 
+  EyeOff, 
+  Loader, 
   GraduationCap, 
   Users, 
-  BookOpen, 
+  User, 
   Shield, 
-  User,
-  Mail,
-  Lock,
-  Phone,
-  Building,
-  IdCard,
-  UserCheck,
+  BookOpen,
   Plus,
-  X
+  X,
+  Mail,
+  Phone,
+  Lock,
+  IdCard,
+  Building
 } from 'lucide-react';
 import api from '../../utils/api';
-import '../../styles/components/Login.css';
-import logoImage from '../../assets/images/logo-desk.png';
+import logo from '../../assets/logo-desk.png';
+import '../../styles/components/Register.css';
 
 const Register = () => {
   const [searchParams] = useSearchParams();
@@ -29,7 +31,7 @@ const Register = () => {
     email: '',
     password: '',
     phoneNumber: '',
-    role: selectedRole,
+    role: searchParams.get('role') || 'student',
     // Student fields
     department: '',
     matricNumber: '',
@@ -44,6 +46,7 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Update role when URL param changes
   useEffect(() => {
@@ -53,11 +56,11 @@ const Register = () => {
   }, [searchParams]);
 
   const roles = [
-    { id: 'student', name: 'Student', icon: GraduationCap, color: 'bg-blue-500' },
-    { id: 'parent', name: 'Parent', icon: Users, color: 'bg-green-500' },
-    { id: 'staff', name: 'Staff', icon: User, color: 'bg-purple-500' },
-    { id: 'dean', name: 'Dean', icon: BookOpen, color: 'bg-indigo-500' },
-    { id: 'security', name: 'Security', icon: Shield, color: 'bg-red-500' }
+    { id: 'student', name: 'Student', icon: GraduationCap, color: '#2F54EB' },
+    { id: 'parent', name: 'Parent', icon: Users, color: '#10B981' },
+    { id: 'staff', name: 'Staff', icon: User, color: '#8B5CF6' },
+    { id: 'dean', name: 'Dean', icon: BookOpen, color: '#F59E0B' },
+    { id: 'security', name: 'Security', icon: Shield, color: '#EF4444' }
   ];
 
   const staffTypes = [
@@ -77,7 +80,7 @@ const Register = () => {
     setSelectedRole(role);
     setFormData(prev => ({
       ...prev,
-    role,
+      role,
       // Reset role-specific fields when changing roles
       department: '',
       matricNumber: '',
@@ -135,51 +138,48 @@ const Register = () => {
   const renderRoleSpecificFields = () => {
     switch (selectedRole) {
       case 'student':
-  return (
+        return (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Department *
-                </label>
+            <div className="input-row">
+              <div className="input-group">
+                <label htmlFor="department" className="input-label">Department</label>
                 <input
-                  type="text"
+                  id="department"
                   name="department"
+                  type="text"
+                  required
                   value={formData.department}
                   onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="form-input"
                   placeholder="e.g., Computer Science"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Matric Number *
-                </label>
+              <div className="input-group">
+                <label htmlFor="matricNumber" className="input-label">Matric Number</label>
                 <input
-                  type="text"
+                  id="matricNumber"
                   name="matricNumber"
+                  type="text"
+                  required
                   value={formData.matricNumber}
                   onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="form-input"
                   placeholder="e.g., CSC/2020/001"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gender *
-                </label>
+            <div className="input-row">
+              <div className="input-group">
+                <label htmlFor="gender" className="input-label">Gender</label>
                 <select
+                  id="gender"
                   name="gender"
+                  required
                   value={formData.gender}
                   onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="form-input"
                 >
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
@@ -187,17 +187,16 @@ const Register = () => {
                 </select>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Parent Email *
-                </label>
-              <input
-                type="email"
+              <div className="input-group">
+                <label htmlFor="parentEmail" className="input-label">Parent Email</label>
+                <input
+                  id="parentEmail"
                   name="parentEmail"
+                  type="email"
+                  required
                   value={formData.parentEmail}
                   onChange={handleInputChange}
-                required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="form-input"
                   placeholder="parent@example.com"
                 />
               </div>
@@ -207,29 +206,27 @@ const Register = () => {
 
       case 'parent':
         return (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Children Information *
-              </label>
+          <div className="children-section">
+            <div className="children-header">
+              <label className="section-label">Children Information</label>
               <button
                 type="button"
                 onClick={addChild}
-                className="flex items-center text-sm text-blue-600 hover:text-blue-700"
+                className="add-child-btn"
               >
-                <Plus className="w-4 h-4 mr-1" />
+                <Plus size={16} />
                 Add Child
               </button>
             </div>
 
             {formData.children.length === 0 && (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                <Users className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-500">No children added yet</p>
+              <div className="empty-children">
+                <Users className="empty-icon" size={48} />
+                <p>No children added yet</p>
                 <button
                   type="button"
                   onClick={addChild}
-                  className="mt-2 text-blue-600 hover:text-blue-700"
+                  className="add-first-child-btn"
                 >
                   Add your first child
                 </button>
@@ -237,25 +234,25 @@ const Register = () => {
             )}
             
             {formData.children.map((child, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4 mb-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium text-gray-900">Child {index + 1}</h4>
+              <div key={index} className="child-card">
+                <div className="child-header">
+                  <h4>Child {index + 1}</h4>
                   <button
                     type="button"
                     onClick={() => removeChild(index)}
-                    className="text-red-600 hover:text-red-700"
+                    className="remove-child-btn"
                   >
-                    <X className="w-4 h-4" />
+                    <X size={16} />
                   </button>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="child-inputs">
                   <input
                     type="text"
                     placeholder="Matric Number"
                     value={child.matricNumber}
                     onChange={(e) => updateChild(index, 'matricNumber', e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="form-input"
                     required
                   />
                   <input
@@ -263,18 +260,18 @@ const Register = () => {
                     placeholder="First Name"
                     value={child.firstName}
                     onChange={(e) => updateChild(index, 'firstName', e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="form-input"
                     required
                   />
-              <input
+                  <input
                     type="text"
                     placeholder="Last Name"
                     value={child.lastName}
                     onChange={(e) => updateChild(index, 'lastName', e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
+                    className="form-input"
+                    required
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -284,47 +281,46 @@ const Register = () => {
       case 'dean':
       case 'security':
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Office/Department *
-              </label>
-              <input
-                type="text"
-                name="office"
-                value={formData.office}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., Academic Affairs, Security Office"
-              />
+          <>
+            <div className="input-row">
+              <div className="input-group">
+                <label htmlFor="office" className="input-label">Office/Department</label>
+                <input
+                  id="office"
+                  name="office"
+                  type="text"
+                  required
+                  value={formData.office}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., Academic Affairs, Security Office"
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="staffId" className="input-label">Staff ID</label>
+                <input
+                  id="staffId"
+                  name="staffId"
+                  type="text"
+                  required
+                  value={formData.staffId}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., ST/2024/001"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Staff ID *
-              </label>
-              <input
-                type="text"
-                name="staffId"
-                value={formData.staffId}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., ST/2024/001"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Staff Type *
-              </label>
+            <div className="input-group">
+              <label htmlFor="staffType" className="input-label">Staff Type</label>
               <select
+                id="staffType"
                 name="staffType"
+                required
                 value={formData.staffType}
                 onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="form-input"
               >
                 <option value="">Select Staff Type</option>
                 {staffTypes
@@ -341,7 +337,7 @@ const Register = () => {
                 }
               </select>
             </div>
-          </div>
+          </>
         );
 
       default:
@@ -350,24 +346,24 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
-              <GraduationCap className="w-7 h-7 text-white" />
-            </div>
+    <div className="register-page">
+      <div className="register-container">
+        <div className="register-card">
+          {/* Logo Section */}
+          <div className="logo-section">
+            <img src={logo} alt="Veritas University Logo" className="university-logo" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-          <p className="text-gray-600 mt-2">Join the Veritas University Exeat System</p>
-        </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
+          {/* Header Section */}
+          <div className="header-section">
+            <h1 className="welcome-heading">Join Veritas Exeat System</h1>
+            <p className="welcome-subtitle">Create your account to get started with the university exeat management system</p>
+          </div>
+
           {/* Role Selection */}
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Your Role</h2>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="role-selection">
+            <label className="section-label">Select Your Role</label>
+            <div className="role-grid">
               {roles.map((role) => {
                 const Icon = role.icon;
                 return (
@@ -375,188 +371,160 @@ const Register = () => {
                     key={role.id}
                     type="button"
                     onClick={() => handleRoleChange(role.id)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      selectedRole === role.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`role-btn ${selectedRole === role.id ? 'active' : ''}`}
+                    style={{ '--role-color': role.color }}
                   >
-                    <div className={`w-8 h-8 ${role.color} rounded-lg flex items-center justify-center mx-auto mb-2`}>
-                      <Icon className="w-5 h-5 text-white" />
+                    <div className="role-icon-wrapper">
+                      <Icon size={20} />
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{role.name}</span>
+                    <span>{role.name}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <X className="w-5 h-5 text-red-400" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-700">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
+          {/* Error Display */}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
 
+          {/* Registration Form */}
+          <form onSubmit={handleSubmit} className="register-form">
             {/* Basic Information */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                <User className="w-5 h-5 mr-2 text-blue-600" />
+            <div className="form-section">
+              <label className="section-label">
+                <User size={18} />
                 Basic Information
-              </h3>
+              </label>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    First Name *
-                  </label>
+              <div className="input-row">
+                <div className="input-group">
+                  <label htmlFor="firstName" className="input-label">First Name</label>
                   <input
-                    type="text"
+                    id="firstName"
                     name="firstName"
+                    type="text"
+                    required
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="form-input"
                     placeholder="Enter your first name"
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Last Name *
-                  </label>
-              <input
-                type="text"
+                <div className="input-group">
+                  <label htmlFor="lastName" className="input-label">Last Name</label>
+                  <input
+                    id="lastName"
                     name="lastName"
+                    type="text"
+                    required
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="form-input"
                     placeholder="Enter your last name"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
+              <div className="input-row">
+                <div className="input-group">
+                  <label htmlFor="email" className="input-label">Email Address</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="your.email@example.com"
+                  />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Phone className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      type="tel"
-                name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="+234 xxx xxx xxxx"
-                    />
-                  </div>
+                <div className="input-group">
+                  <label htmlFor="phoneNumber" className="input-label">Phone Number</label>
+                  <input
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    type="tel"
+                    required
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="+234 xxx xxx xxxx"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
+              <div className="input-group">
+                <label htmlFor="password" className="input-label">Password</label>
+                <div className="password-input-wrapper">
                   <input
-                    type="password"
+                    id="password"
                     name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    minLength={6}
                     value={formData.password}
                     onChange={handleInputChange}
-                required
-                    minLength={6}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="form-input password-input"
                     placeholder="At least 6 characters"
-              />
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="password-toggle-btn"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Role-specific fields */}
+            {/* Role-specific Information */}
             {selectedRole && (
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                  {selectedRole === 'student' && <GraduationCap className="w-5 h-5 mr-2 text-blue-600" />}
-                  {selectedRole === 'parent' && <Users className="w-5 h-5 mr-2 text-blue-600" />}
-                  {(selectedRole === 'staff' || selectedRole === 'dean' || selectedRole === 'security') && <Building className="w-5 h-5 mr-2 text-blue-600" />}
+              <div className="form-section">
+                <label className="section-label">
+                  {selectedRole === 'student' && <GraduationCap size={18} />}
+                  {selectedRole === 'parent' && <Users size={18} />}
+                  {(selectedRole === 'staff' || selectedRole === 'dean' || selectedRole === 'security') && <Building size={18} />}
                   {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Information
-                </h3>
+                </label>
                 {renderRoleSpecificFields()}
               </div>
             )}
 
             {/* Submit Button */}
-            <div className="pt-6">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                  loading
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Creating Account...
-                  </div>
-                ) : (
-                  'Create Account'
-                )}
+            <button 
+              type="submit" 
+              disabled={loading}
+              className={`register-button ${loading ? 'loading' : ''}`}
+            >
+              {loading ? (
+                <>
+                  <Loader className="loading-icon" size={20} />
+                  Creating Account...
+                </>
+              ) : (
+                'Create Account'
+              )}
             </button>
-            </div>
-
-            {/* Footer Links */}
-            <div className="text-center space-y-4">
-              <p className="text-gray-600">
-                Already have an account?{' '}
-                <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
-                  Sign In
-                </Link>
-              </p>
-
-              <Link to="/" className="inline-flex items-center text-gray-500 hover:text-gray-700">
-                ← Back to Home
-              </Link>
-            </div>
           </form>
+
+          {/* Footer Section */}
+          <div className="footer-section">
+            <p className="signin-text">
+              Already have an account? <Link to="/login" className="signin-link">Sign In</Link>
+            </p>
+            <Link to="/" className="back-home-link">
+              ← Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     </div>
