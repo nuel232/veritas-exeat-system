@@ -213,6 +213,26 @@ body, html {
   border-left: 3px solid #2F54EB;
 }
 
+/* Role Notice Styles */
+.role-notice {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.notice-text {
+  margin: 0;
+  font-size: 14px;
+  color: #ea580c;
+  line-height: 1.4;
+}
+
+.notice-text strong {
+  color: #c2410c;
+}
+
 .form-input {
   width: 100%;
   padding: 16px;

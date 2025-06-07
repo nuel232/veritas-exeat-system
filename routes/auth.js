@@ -49,8 +49,8 @@ router.post('/register', [
   
   // Staff/Dean/Security validations
   body('office').custom((value, { req }) => {
-    if (['staff', 'dean'].includes(req.body.role) && !value) {
-      throw new Error('Office is required for staff and dean roles');
+    if (req.body.role === 'staff' && !value) {
+      throw new Error('Office is required for staff role');
     }
     return true;
   }),
@@ -67,12 +67,6 @@ router.post('/register', [
     const validStaffTypes = ['father', 'sister', 'hostel_admin'];
     if (req.body.role === 'staff' && !validStaffTypes.includes(value)) {
       throw new Error('Invalid staff type');
-    }
-    return true;
-  }),
-  body('securityLocation').custom((value, { req }) => {
-    if (req.body.role === 'security' && !value) {
-      throw new Error('Security location is required for security role');
     }
     return true;
   }),

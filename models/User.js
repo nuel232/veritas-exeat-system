@@ -58,7 +58,7 @@ const UserSchema = new mongoose.Schema({
   office: {
     type: String,
     required: function() {
-      return ['staff', 'dean'].includes(this.role);
+      return this.role === 'staff';
     }
   },
   staffId: {
@@ -74,13 +74,6 @@ const UserSchema = new mongoose.Schema({
     enum: ['father', 'sister', 'hostel_admin'],
     required: function() {
       return this.role === 'staff';
-    }
-  },
-  securityLocation: {
-    type: String,
-    enum: ['main_gate', 'hostel_gate', 'academic_gate', 'back_gate', 'sports_complex'],
-    required: function() {
-      return this.role === 'security';
     }
   },
   year: {

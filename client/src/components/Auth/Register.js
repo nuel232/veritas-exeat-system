@@ -44,7 +44,6 @@ const Register = () => {
     staffType: '',
     // Dean fields (office inherited from staff)
     // Security fields
-    securityLocation: '',
     // Parent fields
     children: []
   });
@@ -110,14 +109,6 @@ const Register = () => {
     { id: 'SCI', name: 'Science' }
   ];
 
-  const securityLocations = [
-    { id: 'main_gate', name: 'Main Gate' },
-    { id: 'hostel_gate', name: 'Hostel Gate' },
-    { id: 'academic_gate', name: 'Academic Block Gate' },
-    { id: 'back_gate', name: 'Back Gate' },
-    { id: 'sports_complex', name: 'Sports Complex Gate' }
-  ];
-
   // Generate VUG ID format helper
   const generateVUGId = (role, department, year) => {
     const currentYear = new Date().getFullYear().toString().slice(-2);
@@ -150,7 +141,6 @@ const Register = () => {
       office: '',
       staffId: '',
       staffType: '',
-      securityLocation: '',
       children: []
     }));
     // Update URL
@@ -597,35 +587,26 @@ const Register = () => {
       case 'dean':
         return (
           <>
-            <div className="input-row">
-              <div className="input-group">
-                <label htmlFor="office" className="input-label">Dean Office</label>
-                <input
-                  id="office"
-                  name="office"
-                  type="text"
-                  required
-                  value={formData.office}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="e.g., Dean of Students Affairs, Dean of Academics"
-                />
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="year" className="input-label">Year of Appointment</label>
-                <input
-                  id="year"
-                  name="year"
-                  type="text"
-                  required
-                  value={formData.year}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="e.g., 24 (for 2024)"
-                  maxLength={2}
-                />
-              </div>
+            <div className="role-notice">
+              <p className="notice-text">
+                <strong>Note:</strong> This registration is for the Dean of Student Affairs position. 
+                There is only one dean position in the university.
+              </p>
+            </div>
+            
+            <div className="input-group">
+              <label htmlFor="year" className="input-label">Year of Appointment</label>
+              <input
+                id="year"
+                name="year"
+                type="text"
+                required
+                value={formData.year}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="e.g., 24 (for 2024)"
+                maxLength={2}
+              />
             </div>
 
             <div className="input-group">
@@ -656,40 +637,19 @@ const Register = () => {
       case 'security':
         return (
           <>
-            <div className="input-row">
-              <div className="input-group">
-                <label htmlFor="securityLocation" className="input-label">Security Location/Gate</label>
-                <select
-                  id="securityLocation"
-                  name="securityLocation"
-                  required
-                  value={formData.securityLocation}
-                  onChange={handleInputChange}
-                  className="form-input"
-                >
-                  <option value="">Select Location</option>
-                  {securityLocations.map(location => (
-                    <option key={location.id} value={location.id}>
-                      {location.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="year" className="input-label">Year of Employment</label>
-                <input
-                  id="year"
-                  name="year"
-                  type="text"
-                  required
-                  value={formData.year}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="e.g., 24 (for 2024)"
-                  maxLength={2}
-                />
-              </div>
+            <div className="input-group">
+              <label htmlFor="year" className="input-label">Year of Employment</label>
+              <input
+                id="year"
+                name="year"
+                type="text"
+                required
+                value={formData.year}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="e.g., 24 (for 2024)"
+                maxLength={2}
+              />
             </div>
 
             <div className="input-group">
