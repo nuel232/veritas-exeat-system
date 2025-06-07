@@ -109,72 +109,65 @@ const Login = () => {
   const roleInfo = suggestedRole ? getRoleInfo(suggestedRole) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+    <div className="login-container">
       {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="login-background">
         {/* Floating Geometric Shapes */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-blue-400/20 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-16 h-16 bg-purple-400/20 rounded-lg rotate-45 animate-spin-slow"></div>
-        <div className="absolute bottom-20 left-20 w-24 h-24 bg-indigo-400/20 rounded-full animate-bounce"></div>
-        <div className="absolute bottom-40 right-10 w-12 h-12 bg-pink-400/20 rounded-lg animate-pulse"></div>
+        <div className="floating-shape floating-shape-1 animate-pulse"></div>
+        <div className="floating-shape floating-shape-2 animate-spin-slow"></div>
+        <div className="floating-shape floating-shape-3 animate-bounce"></div>
+        <div className="floating-shape floating-shape-4 animate-pulse"></div>
         
         {/* Gradient Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-300/30 to-purple-300/30 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-indigo-300/30 to-pink-300/30 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="gradient-orb-1 animate-float"></div>
+        <div className="gradient-orb-2 animate-float-delayed"></div>
       </div>
 
       {/* Main Container */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className={`w-full max-w-6xl grid lg:grid-cols-5 gap-8 transform transition-all duration-1000 ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+      <div className="login-main">
+        <div className={`login-grid ${isVisible ? 'visible' : ''}`}>
           
           {/* Left Side - Branding & Info */}
-          <div className="lg:col-span-2 hidden lg:flex flex-col justify-center space-y-8 p-8">
+          <div className="login-sidebar">
             {/* University Branding */}
-            <div className="space-y-6 animate-slide-in-left">
-              <div className="flex items-center space-x-4">
-                <div className="relative group">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                    {!logoError ? (
-                      <img 
-                        src="/logo.png" 
-                        alt="Veritas University" 
-                        className="w-10 h-10 object-contain"
-                        onError={() => setLogoError(true)}
-                      />
-                    ) : (
-                      <GraduationCap className="w-10 h-10 text-white" />
-                    )}
-                  </div>
-                  <Sparkles className="absolute -top-1 -right-1 w-5 h-5 text-yellow-400 animate-pulse" />
+            <div className="university-branding animate-slide-in-left">
+              <div className="brand-header">
+                <div className="logo-container">
+                  {!logoError ? (
+                    <img 
+                      src="/logo.png" 
+                      alt="Veritas University"
+                      onError={() => setLogoError(true)}
+                    />
+                  ) : (
+                    <GraduationCap />
+                  )}
+                  <Sparkles className="logo-sparkle animate-pulse" />
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                    Veritas University
-                  </h1>
-                  <p className="text-gray-600 font-medium">Student Exeat Management</p>
+                <div className="brand-text">
+                  <h1>Veritas University</h1>
+                  <p>Student Exeat Management</p>
                 </div>
               </div>
             </div>
 
             {/* Role Showcase */}
             {roleInfo && (
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 animate-slide-in-left animation-delay-200">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className={`w-12 h-12 bg-gradient-to-br from-${roleInfo.color}-500 to-${roleInfo.color}-600 rounded-xl flex items-center justify-center shadow-lg`}>
-                    <roleInfo.icon className="w-6 h-6 text-white" />
+              <div className="role-showcase animate-slide-in-left animation-delay-200">
+                <div className="role-header">
+                  <div className={`role-icon ${roleInfo.color}`}>
+                    <roleInfo.icon />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">{roleInfo.title}</h3>
-                    <p className="text-gray-600">{roleInfo.description}</p>
+                  <div className="role-info">
+                    <h3>{roleInfo.title}</h3>
+                    <p>{roleInfo.description}</p>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="role-features">
                   {roleInfo.features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-2 text-gray-700">
-                      <ChevronRight className="w-4 h-4 text-blue-500" />
-                      <span className="text-sm">{feature}</span>
+                    <div key={index} className="feature-item">
+                      <ChevronRight className="feature-icon" />
+                      <span className="feature-text">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -182,60 +175,54 @@ const Login = () => {
             )}
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-4 animate-slide-in-left animation-delay-400">
+            <div className="stats-grid animate-slide-in-left animation-delay-400">
               {[
                 { number: '1000+', label: 'Active Students' },
                 { number: '500+', label: 'Approved Requests' },
                 { number: '99.9%', label: 'System Uptime' }
               ].map((stat, index) => (
-                <div key={index} className="bg-white/50 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg border border-white/20 hover:bg-white/70 transition-all duration-300 hover:scale-105">
-                  <h4 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    {stat.number}
-                  </h4>
-                  <p className="text-gray-600 text-sm font-medium">{stat.label}</p>
+                <div key={index} className="stat-card">
+                  <h4 className="stat-number">{stat.number}</h4>
+                  <p className="stat-label">{stat.label}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Right Side - Login Form */}
-          <div className="lg:col-span-3 flex items-center justify-center">
-            <div className={`w-full max-w-lg transform transition-all duration-1000 ${
-              isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
-            }`}>
+          <div className="login-form-section">
+            <div className={`login-form-container ${isVisible ? 'visible' : ''}`}>
               
               {/* Login Card */}
-              <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 space-y-8 hover:shadow-3xl transition-all duration-500">
+              <div className="login-card">
                 
                 {/* Card Header */}
-                <div className="text-center space-y-2 animate-fade-in">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                    Welcome Back
-                  </h2>
-                  <p className="text-gray-600 font-medium">
+                <div className="card-header animate-fade-in">
+                  <h2 className="card-title">Welcome Back</h2>
+                  <p className="card-subtitle">
                     Sign in to continue to your {roleInfo ? roleInfo.title.toLowerCase() : 'dashboard'}
                   </p>
                 </div>
 
                 {/* Error Banner */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3 animate-shake">
-                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span className="text-red-700 font-medium">{error}</span>
+                  <div className="error-banner animate-shake">
+                    <AlertCircle className="error-icon" />
+                    <span className="error-text">{error}</span>
                   </div>
                 )}
 
                 {/* Login Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="login-form">
                   
                   {/* Email Field */}
-                  <div className="space-y-2 animate-slide-up animation-delay-100">
-                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <div className="form-group animate-slide-up animation-delay-100">
+                    <label htmlFor="email" className="form-label">
                       Email Address
                     </label>
-                    <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Mail className="w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200" />
+                    <div className="input-wrapper group">
+                      <div className="input-icon-left">
+                        <Mail />
                       </div>
                       <input
                         id="email"
@@ -245,21 +232,21 @@ const Login = () => {
                         required
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 font-medium hover:bg-gray-50 focus:bg-white focus:shadow-lg"
+                        className="form-input"
                         placeholder="Enter your email address"
                       />
-                      <div className="absolute inset-0 rounded-xl border-2 border-transparent group-focus-within:border-blue-500 pointer-events-none transition-all duration-200"></div>
+                      <div className="input-focus-border"></div>
                     </div>
                   </div>
 
                   {/* Password Field */}
-                  <div className="space-y-2 animate-slide-up animation-delay-200">
-                    <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <div className="form-group animate-slide-up animation-delay-200">
+                    <label htmlFor="password" className="form-label">
                       Password
                     </label>
-                    <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Lock className="w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200" />
+                    <div className="input-wrapper group">
+                      <div className="input-icon-left">
+                        <Lock />
                       </div>
                       <input
                         id="password"
@@ -269,50 +256,41 @@ const Login = () => {
                         required
                         value={formData.password}
                         onChange={handleInputChange}
-                        className="w-full pl-12 pr-12 py-4 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 font-medium hover:bg-gray-50 focus:bg-white focus:shadow-lg"
+                        className="form-input password-input"
                         placeholder="Enter your password"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:text-blue-500 transition-colors duration-200 focus:outline-none"
+                        className="input-icon-right"
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPassword ? <EyeOff /> : <Eye />}
                       </button>
-                      <div className="absolute inset-0 rounded-xl border-2 border-transparent group-focus-within:border-blue-500 pointer-events-none transition-all duration-200"></div>
+                      <div className="input-focus-border"></div>
                     </div>
                   </div>
 
                   {/* Form Options */}
-                  <div className="flex items-center justify-between animate-slide-up animation-delay-300">
-                    <label className="flex items-center space-x-3 cursor-pointer group">
-                      <div className="relative">
+                  <div className="form-options animate-slide-up animation-delay-300">
+                    <label className="checkbox-wrapper">
+                      <div className="checkbox-container">
                         <input 
                           type="checkbox" 
                           checked={rememberMe}
                           onChange={(e) => setRememberMe(e.target.checked)}
-                          className="sr-only"
+                          className="checkbox-input"
                         />
-                        <div className={`w-5 h-5 rounded border-2 transition-all duration-200 ${
-                          rememberMe 
-                            ? 'bg-blue-500 border-blue-500' 
-                            : 'border-gray-300 group-hover:border-gray-400'
-                        }`}>
+                        <div className={`checkbox-custom ${rememberMe ? 'checked' : 'unchecked'}`}>
                           {rememberMe && (
-                            <svg className="w-3 h-3 text-white absolute top-0.5 left-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="checkbox-icon" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           )}
                         </div>
                       </div>
-                      <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">
-                        Remember me
-                      </span>
+                      <span className="checkbox-label">Remember me</span>
                     </label>
-                    <Link 
-                      to="/forgot-password" 
-                      className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
-                    >
+                    <Link to="/forgot-password" className="forgot-link">
                       Forgot password?
                     </Link>
                   </div>
@@ -321,47 +299,42 @@ const Login = () => {
                   <button 
                     type="submit" 
                     disabled={loading}
-                    className="group relative w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden animate-slide-up animation-delay-400"
+                    className="submit-button animate-slide-up animation-delay-400"
                   >
-                    <div className="relative z-10 flex items-center justify-center space-x-2">
+                    <div className="button-content">
                       {loading ? (
                         <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <Loader2 className="loading-icon animate-spin" />
                           <span>Signing In...</span>
                         </>
                       ) : (
                         <>
                           <span>Sign In</span>
-                          <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                          <ChevronRight className="chevron-icon" />
                         </>
                       )}
                     </div>
-                    
-                    {/* Button Ripple Effect */}
-                    <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                    <div className="button-ripple"></div>
                   </button>
                 </form>
 
                 {/* Form Footer */}
-                <div className="space-y-4 animate-slide-up animation-delay-500">
-                  <div className="text-center">
-                    <p className="text-gray-600 font-medium">
+                <div className="form-footer animate-slide-up animation-delay-500">
+                  <div>
+                    <p className="signup-text">
                       Don't have an account?{' '}
                       <Link 
                         to={suggestedRole ? `/register?role=${suggestedRole}` : '/register'} 
-                        className="font-bold text-blue-600 hover:text-blue-700 hover:underline transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                        className="signup-link"
                       >
                         Create Account
                       </Link>
                     </p>
                   </div>
                   
-                  <div className="text-center pt-4 border-t border-gray-200">
-                    <Link 
-                      to="/" 
-                      className="inline-flex items-center space-x-2 text-gray-500 hover:text-gray-700 font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded group"
-                    >
-                      <Home className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
+                  <div className="footer-divider">
+                    <Link to="/" className="home-link">
+                      <Home className="home-icon" />
                       <span>Back to Home</span>
                     </Link>
                   </div>
