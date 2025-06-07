@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['student', 'parent', 'dean', 'security', 'staff'],
+    enum: ['student', 'parent', 'security', 'staff'],
     default: 'student'
   },
   department: {
@@ -64,7 +64,7 @@ const UserSchema = new mongoose.Schema({
   staffId: {
     type: String,
     required: function() {
-      return ['staff', 'dean', 'security'].includes(this.role);
+      return ['staff', 'security'].includes(this.role);
     },
     unique: true,
     sparse: true
@@ -79,7 +79,7 @@ const UserSchema = new mongoose.Schema({
   year: {
     type: String,
     required: function() {
-      return ['student', 'staff', 'dean', 'security'].includes(this.role);
+      return ['student', 'staff', 'security'].includes(this.role);
     }
   },
   children: [{

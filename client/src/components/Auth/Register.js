@@ -88,7 +88,6 @@ const Register = () => {
     { id: 'student', name: 'Student', icon: GraduationCap, color: '#2F54EB' },
     { id: 'parent', name: 'Parent', icon: Users, color: '#10B981' },
     { id: 'staff', name: 'Staff', icon: User, color: '#8B5CF6' },
-    { id: 'dean', name: 'Dean', icon: BookOpen, color: '#F59E0B' },
     { id: 'security', name: 'Security', icon: Shield, color: '#EF4444' }
   ];
 
@@ -115,7 +114,6 @@ const Register = () => {
     let deptCode = department;
     
     // For non-students, use role-based department codes
-    if (role === 'dean') deptCode = 'DEAN';
     if (role === 'security') deptCode = 'SEC';
     if (role === 'staff') deptCode = 'STAFF';
     
@@ -584,56 +582,6 @@ const Register = () => {
           </>
         );
 
-      case 'dean':
-        return (
-          <>
-            <div className="role-notice">
-              <p className="notice-text">
-                <strong>Note:</strong> This registration is for the Dean of Student Affairs position. 
-                There is only one dean position in the university.
-              </p>
-            </div>
-            
-            <div className="input-group">
-              <label htmlFor="year" className="input-label">Year of Appointment</label>
-              <input
-                id="year"
-                name="year"
-                type="text"
-                required
-                value={formData.year}
-                onChange={handleInputChange}
-                className="form-input"
-                placeholder="e.g., 24 (for 2024)"
-                maxLength={2}
-              />
-            </div>
-
-            <div className="input-group">
-              <label htmlFor="staffId" className="input-label">
-                Dean ID
-                {formData.year && (
-                  <span className="id-preview">
-                    Format: {generateVUGId('dean', '', formData.year)}###
-                  </span>
-                )}
-              </label>
-              <input
-                id="staffId"
-                name="staffId"
-                type="text"
-                required
-                value={formData.staffId}
-                onChange={handleInputChange}
-                className="form-input"
-                placeholder={formData.year ? 
-                  `${generateVUGId('dean', '', formData.year)}001` : 
-                  "e.g., VUG/DEAN/24/001"}
-              />
-            </div>
-          </>
-        );
-
       case 'security':
         return (
           <>
@@ -829,7 +777,7 @@ const Register = () => {
                 <label className="section-label">
                   {selectedRole === 'student' && <GraduationCap size={18} />}
                   {selectedRole === 'parent' && <Users size={18} />}
-                  {(selectedRole === 'staff' || selectedRole === 'dean' || selectedRole === 'security') && <Building size={18} />}
+                  {(selectedRole === 'staff' || selectedRole === 'security') && <Building size={18} />}
                   {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Information
                 </label>
                 {renderRoleSpecificFields()}

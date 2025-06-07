@@ -12,7 +12,7 @@ router.post('/register', [
   body('lastName').notEmpty().withMessage('Last name is required'),
   body('email').isEmail().withMessage('Please enter a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-  body('role').isIn(['student', 'parent', 'dean', 'security', 'staff']).withMessage('Invalid role'),
+  body('role').isIn(['student', 'parent', 'security', 'staff']).withMessage('Invalid role'),
   body('phoneNumber').notEmpty().withMessage('Phone number is required'),
   
   // Student-specific validations
@@ -47,7 +47,7 @@ router.post('/register', [
     return true;
   }),
   
-  // Staff/Dean/Security validations
+  // Staff/Security validations
   body('office').custom((value, { req }) => {
     if (req.body.role === 'staff' && !value) {
       throw new Error('Office is required for staff role');
@@ -55,8 +55,8 @@ router.post('/register', [
     return true;
   }),
   body('staffId').custom((value, { req }) => {
-    if (['staff', 'dean', 'security'].includes(req.body.role) && !value) {
-      throw new Error('Staff ID is required for staff, dean, and security roles');
+    if (['staff', 'security'].includes(req.body.role) && !value) {
+      throw new Error('Staff ID is required for staff and security roles');
     }
     return true;
   }),
@@ -71,7 +71,7 @@ router.post('/register', [
     return true;
   }),
   body('year').custom((value, { req }) => {
-    if (['student', 'staff', 'dean', 'security'].includes(req.body.role) && !value) {
+    if (['student', 'staff', 'security'].includes(req.body.role) && !value) {
       throw new Error('Year is required');
     }
     return true;
@@ -115,8 +115,8 @@ router.post('/register', [
       }
     }
 
-    // For staff/dean/security, check if staffId is already taken
-    if (['staff', 'dean', 'security'].includes(req.body.role)) {
+    // For staff/security, check if staffId is already taken
+    if (['staff', 'security'].includes(req.body.role)) {
       const existingStaff = await User.findOne({ staffId: req.body.staffId });
       if (existingStaff) {
         return res.status(400).json({ message: 'Staff ID already exists' });
