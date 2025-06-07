@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom animations that complement Tailwind */
+@layer utilities {
+  .animation-delay-100 { 
+    animation-delay: 0.1s; 
+    opacity: 0; 
+  }
+  .animation-delay-200 { 
+    animation-delay: 0.2s; 
+    opacity: 0; 
+  }
+  .animation-delay-300 { 
+    animation-delay: 0.3s; 
+    opacity: 0; 
+  }
+  .animation-delay-400 { 
+    animation-delay: 0.4s; 
+    opacity: 0; 
+  }
+  .animation-delay-500 { 
+    animation-delay: 0.5s; 
+    opacity: 0; 
+  }
+}
+
 /* Modern CSS Reset and Base Styles */
 * {
   margin: 0;
@@ -750,4 +774,22 @@ button {
   .btn {
     width: 100%;
   }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
