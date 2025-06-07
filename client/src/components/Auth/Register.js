@@ -120,9 +120,40 @@ const Register = () => {
     return `VUG/${deptCode}/${year || currentYear}/`;
   };
 
+  // Extract year from ID format
+  const extractYearFromId = (id) => {
+    const parts = id.split('/');
+    return parts.length >= 3 ? parts[2] : '';
+  };
+
+  // Auto-populate office based on staff type
+  const getOfficeFromStaffType = (staffType) => {
+    const officeMap = {
+      'father': 'Boys Hostel Administration',
+      'sister': 'Girls Hostel Administration', 
+      'hostel_admin': 'Hostel Administration Office'
+    };
+    return officeMap[staffType] || '';
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    let updates = { [name]: value };
+    
+    // Auto-populate office when staff type changes
+    if (name === 'staffType' && selectedRole === 'staff') {
+      updates.office = getOfficeFromStaffType(value);
+    }
+    
+    // Auto-extract year when ID is entered
+    if ((name === 'matricNumber' || name === 'staffId') && value) {
+      const extractedYear = extractYearFromId(value);
+      if (extractedYear) {
+        updates.year = extractedYear;
+      }
+    }
+    
+    setFormData(prev => ({ ...prev, ...updates }));
   };
 
   const handleRoleChange = (role) => {
@@ -304,28 +335,11 @@ const Register = () => {
               </div>
 
               <div className="input-group">
-                <label htmlFor="year" className="input-label">Year of Admission</label>
-                <input
-                  id="year"
-                  name="year"
-                  type="text"
-                  required
-                  value={formData.year}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="e.g., 22 (for 2022)"
-                  maxLength={2}
-                />
-              </div>
-            </div>
-
-            <div className="input-row">
-              <div className="input-group">
                 <label htmlFor="matricNumber" className="input-label">
                   Matric Number 
-                  {formData.department && formData.year && (
+                  {formData.department && (
                     <span className="id-preview">
-                      Format: {generateVUGId('student', formData.department, formData.year)}###
+                      Format: VUG/{formData.department}/YY/###
                     </span>
                   )}
                 </label>
@@ -337,12 +351,14 @@ const Register = () => {
                   value={formData.matricNumber}
                   onChange={handleInputChange}
                   className="form-input"
-                  placeholder={formData.department && formData.year ? 
-                    `${generateVUGId('student', formData.department, formData.year)}001` : 
+                  placeholder={formData.department ? 
+                    `VUG/${formData.department}/24/001` : 
                     "e.g., VUG/CSC/22/001"}
                 />
               </div>
+            </div>
 
+            <div className="input-row">
               <div className="input-group">
                 <label htmlFor="gender" className="input-label">Gender</label>
                 <select
@@ -507,60 +523,6 @@ const Register = () => {
           <>
             <div className="input-row">
               <div className="input-group">
-                <label htmlFor="office" className="input-label">Office/Department</label>
-                <input
-                  id="office"
-                  name="office"
-                  type="text"
-                  required
-                  value={formData.office}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="e.g., Hostel Administration, Academic Affairs"
-                />
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="year" className="input-label">Year of Employment</label>
-                <input
-                  id="year"
-                  name="year"
-                  type="text"
-                  required
-                  value={formData.year}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="e.g., 24 (for 2024)"
-                  maxLength={2}
-                />
-              </div>
-            </div>
-
-            <div className="input-row">
-              <div className="input-group">
-                <label htmlFor="staffId" className="input-label">
-                  Staff ID
-                  {formData.year && (
-                    <span className="id-preview">
-                      Format: {generateVUGId('staff', '', formData.year)}###
-                    </span>
-                  )}
-                </label>
-                <input
-                  id="staffId"
-                  name="staffId"
-                  type="text"
-                  required
-                  value={formData.staffId}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder={formData.year ? 
-                    `${generateVUGId('staff', '', formData.year)}001` : 
-                    "e.g., VUG/STAFF/24/001"}
-                />
-              </div>
-
-              <div className="input-group">
                 <label htmlFor="staffType" className="input-label">Staff Type</label>
                 <select
                   id="staffType"
@@ -578,36 +540,36 @@ const Register = () => {
                   ))}
                 </select>
               </div>
-            </div>
-          </>
-        );
 
-      case 'security':
-        return (
-          <>
-            <div className="input-group">
-              <label htmlFor="year" className="input-label">Year of Employment</label>
-              <input
-                id="year"
-                name="year"
-                type="text"
-                required
-                value={formData.year}
-                onChange={handleInputChange}
-                className="form-input"
-                placeholder="e.g., 24 (for 2024)"
-                maxLength={2}
-              />
+              <div className="input-group">
+                <label htmlFor="office" className="input-label">
+                  Office/Department
+                  {formData.staffType && (
+                    <span className="id-preview">
+                      Auto-populated from staff type
+                    </span>
+                  )}
+                </label>
+                <input
+                  id="office"
+                  name="office"
+                  type="text"
+                  required
+                  value={formData.office}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="Will auto-populate when you select staff type"
+                  readOnly={!!formData.staffType}
+                />
+              </div>
             </div>
 
             <div className="input-group">
               <label htmlFor="staffId" className="input-label">
-                Security ID
-                {formData.year && (
-                  <span className="id-preview">
-                    Format: {generateVUGId('security', '', formData.year)}###
-                  </span>
-                )}
+                Staff ID
+                <span className="id-preview">
+                  Format: VUG/STAFF/YY/### (Year will be extracted from ID)
+                </span>
               </label>
               <input
                 id="staffId"
@@ -617,9 +579,31 @@ const Register = () => {
                 value={formData.staffId}
                 onChange={handleInputChange}
                 className="form-input"
-                placeholder={formData.year ? 
-                  `${generateVUGId('security', '', formData.year)}001` : 
-                  "e.g., VUG/SEC/24/001"}
+                placeholder="e.g., VUG/STAFF/24/001"
+              />
+            </div>
+          </>
+        );
+
+      case 'security':
+        return (
+          <>
+            <div className="input-group">
+              <label htmlFor="staffId" className="input-label">
+                Security ID
+                <span className="id-preview">
+                  Format: VUG/SEC/YY/### (Year will be extracted from ID)
+                </span>
+              </label>
+              <input
+                id="staffId"
+                name="staffId"
+                type="text"
+                required
+                value={formData.staffId}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="e.g., VUG/SEC/24/001"
               />
             </div>
           </>
