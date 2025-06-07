@@ -37,10 +37,14 @@ const Register = () => {
     matricNumber: '',
     gender: '',
     parentEmail: '',
-    // Staff/Dean/Security fields
+    year: '',
+    // Staff fields
     office: '',
     staffId: '',
     staffType: '',
+    // Dean fields (office inherited from staff)
+    // Security fields
+    securityLocation: '',
     // Parent fields
     children: []
   });
@@ -92,10 +96,40 @@ const Register = () => {
   const staffTypes = [
     { id: 'father', name: 'Father (Boys Hostel)', gender: 'male' },
     { id: 'sister', name: 'Sister (Girls Hostel)', gender: 'female' },
-    { id: 'hostel_admin', name: 'Hostel Administrator', gender: 'both' },
-    { id: 'dean', name: 'Dean', gender: 'both' },
-    { id: 'security_guard', name: 'Security Guard', gender: 'both' }
+    { id: 'hostel_admin', name: 'Hostel Administrator', gender: 'both' }
   ];
+
+  const departments = [
+    { id: 'CSC', name: 'Computer Science' },
+    { id: 'ENG', name: 'Engineering' },
+    { id: 'MED', name: 'Medicine' },
+    { id: 'LAW', name: 'Law' },
+    { id: 'BUS', name: 'Business Administration' },
+    { id: 'EDU', name: 'Education' },
+    { id: 'ART', name: 'Arts' },
+    { id: 'SCI', name: 'Science' }
+  ];
+
+  const securityLocations = [
+    { id: 'main_gate', name: 'Main Gate' },
+    { id: 'hostel_gate', name: 'Hostel Gate' },
+    { id: 'academic_gate', name: 'Academic Block Gate' },
+    { id: 'back_gate', name: 'Back Gate' },
+    { id: 'sports_complex', name: 'Sports Complex Gate' }
+  ];
+
+  // Generate VUG ID format helper
+  const generateVUGId = (role, department, year) => {
+    const currentYear = new Date().getFullYear().toString().slice(-2);
+    let deptCode = department;
+    
+    // For non-students, use role-based department codes
+    if (role === 'dean') deptCode = 'DEAN';
+    if (role === 'security') deptCode = 'SEC';
+    if (role === 'staff') deptCode = 'STAFF';
+    
+    return `VUG/${deptCode}/${year || currentYear}/`;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -106,15 +140,17 @@ const Register = () => {
     setSelectedRole(role);
     setFormData(prev => ({
       ...prev,
-    role,
+      role,
       // Reset role-specific fields when changing roles
       department: '',
       matricNumber: '',
       gender: '',
       parentEmail: '',
+      year: '',
       office: '',
       staffId: '',
       staffType: '',
+      securityLocation: '',
       children: []
     }));
     // Update URL
@@ -257,25 +293,54 @@ const Register = () => {
   const renderRoleSpecificFields = () => {
     switch (selectedRole) {
       case 'student':
-  return (
+        return (
           <>
             <div className="input-row">
               <div className="input-group">
                 <label htmlFor="department" className="input-label">Department</label>
-                <input
+                <select
                   id="department"
                   name="department"
-                  type="text"
                   required
                   value={formData.department}
                   onChange={handleInputChange}
                   className="form-input"
-                  placeholder="e.g., Computer Science"
-                />
+                >
+                  <option value="">Select Department</option>
+                  {departments.map(dept => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="input-group">
-                <label htmlFor="matricNumber" className="input-label">Matric Number</label>
+                <label htmlFor="year" className="input-label">Year of Admission</label>
+                <input
+                  id="year"
+                  name="year"
+                  type="text"
+                  required
+                  value={formData.year}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., 22 (for 2022)"
+                  maxLength={2}
+                />
+              </div>
+            </div>
+
+            <div className="input-row">
+              <div className="input-group">
+                <label htmlFor="matricNumber" className="input-label">
+                  Matric Number 
+                  {formData.department && formData.year && (
+                    <span className="id-preview">
+                      Format: {generateVUGId('student', formData.department, formData.year)}###
+                    </span>
+                  )}
+                </label>
                 <input
                   id="matricNumber"
                   name="matricNumber"
@@ -284,12 +349,12 @@ const Register = () => {
                   value={formData.matricNumber}
                   onChange={handleInputChange}
                   className="form-input"
-                  placeholder="e.g., CSC/2020/001"
+                  placeholder={formData.department && formData.year ? 
+                    `${generateVUGId('student', formData.department, formData.year)}001` : 
+                    "e.g., VUG/CSC/22/001"}
                 />
               </div>
-            </div>
 
-            <div className="input-row">
               <div className="input-group">
                 <label htmlFor="gender" className="input-label">Gender</label>
                 <select
@@ -305,20 +370,20 @@ const Register = () => {
                   <option value="female">Female</option>
                 </select>
               </div>
-              
-              <div className="input-group">
-                <label htmlFor="parentEmail" className="input-label">Parent Email</label>
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="parentEmail" className="input-label">Parent Email</label>
               <input
-                  id="parentEmail"
-                  name="parentEmail"
-                  type="email"
-                  required
-                  value={formData.parentEmail}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="parent@example.com"
-                />
-              </div>
+                id="parentEmail"
+                name="parentEmail"
+                type="email"
+                required
+                value={formData.parentEmail}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="parent@example.com"
+              />
             </div>
           </>
         );
@@ -434,80 +499,220 @@ const Register = () => {
                     required
                     readOnly
                   />
-              <input
+                  <input
                     type="text"
                     placeholder="Last Name"
                     value={child.lastName}
                     onChange={(e) => updateChild(index, 'lastName', e.target.value)}
                     className="form-input"
-                required
+                    required
                     readOnly
-              />
-            </div>
+                  />
+                </div>
               </div>
             ))}
           </div>
         );
 
       case 'staff':
-      case 'dean':
-      case 'security':
         return (
           <>
             <div className="input-row">
               <div className="input-group">
                 <label htmlFor="office" className="input-label">Office/Department</label>
-              <input
+                <input
                   id="office"
                   name="office"
-                type="text"
+                  type="text"
                   required
-                value={formData.office}
-                onChange={handleInputChange}
+                  value={formData.office}
+                  onChange={handleInputChange}
                   className="form-input"
-                placeholder="e.g., Academic Affairs, Security Office"
-              />
-            </div>
+                  placeholder="e.g., Hostel Administration, Academic Affairs"
+                />
+              </div>
 
               <div className="input-group">
-                <label htmlFor="staffId" className="input-label">Staff ID</label>
-              <input
+                <label htmlFor="year" className="input-label">Year of Employment</label>
+                <input
+                  id="year"
+                  name="year"
+                  type="text"
+                  required
+                  value={formData.year}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., 24 (for 2024)"
+                  maxLength={2}
+                />
+              </div>
+            </div>
+
+            <div className="input-row">
+              <div className="input-group">
+                <label htmlFor="staffId" className="input-label">
+                  Staff ID
+                  {formData.year && (
+                    <span className="id-preview">
+                      Format: {generateVUGId('staff', '', formData.year)}###
+                    </span>
+                  )}
+                </label>
+                <input
                   id="staffId"
                   name="staffId"
-                type="text"
+                  type="text"
                   required
-                value={formData.staffId}
-                onChange={handleInputChange}
+                  value={formData.staffId}
+                  onChange={handleInputChange}
                   className="form-input"
-                placeholder="e.g., ST/2024/001"
-              />
+                  placeholder={formData.year ? 
+                    `${generateVUGId('staff', '', formData.year)}001` : 
+                    "e.g., VUG/STAFF/24/001"}
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="staffType" className="input-label">Staff Type</label>
+                <select
+                  id="staffType"
+                  name="staffType"
+                  required
+                  value={formData.staffType}
+                  onChange={handleInputChange}
+                  className="form-input"
+                >
+                  <option value="">Select Staff Type</option>
+                  {staffTypes.map(type => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </>
+        );
+
+      case 'dean':
+        return (
+          <>
+            <div className="input-row">
+              <div className="input-group">
+                <label htmlFor="office" className="input-label">Dean Office</label>
+                <input
+                  id="office"
+                  name="office"
+                  type="text"
+                  required
+                  value={formData.office}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., Dean of Students Affairs, Dean of Academics"
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="year" className="input-label">Year of Appointment</label>
+                <input
+                  id="year"
+                  name="year"
+                  type="text"
+                  required
+                  value={formData.year}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., 24 (for 2024)"
+                  maxLength={2}
+                />
               </div>
             </div>
 
             <div className="input-group">
-              <label htmlFor="staffType" className="input-label">Staff Type</label>
-              <select
-                id="staffType"
-                name="staffType"
+              <label htmlFor="staffId" className="input-label">
+                Dean ID
+                {formData.year && (
+                  <span className="id-preview">
+                    Format: {generateVUGId('dean', '', formData.year)}###
+                  </span>
+                )}
+              </label>
+              <input
+                id="staffId"
+                name="staffId"
+                type="text"
                 required
-                value={formData.staffType}
+                value={formData.staffId}
                 onChange={handleInputChange}
                 className="form-input"
-              >
-                <option value="">Select Staff Type</option>
-                {staffTypes
-                  .filter(type => 
-                    selectedRole === 'dean' ? type.id === 'dean' :
-                    selectedRole === 'security' ? type.id === 'security_guard' :
-                    type.id !== 'dean' && type.id !== 'security_guard'
-                  )
-                  .map(type => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
+                placeholder={formData.year ? 
+                  `${generateVUGId('dean', '', formData.year)}001` : 
+                  "e.g., VUG/DEAN/24/001"}
+              />
+            </div>
+          </>
+        );
+
+      case 'security':
+        return (
+          <>
+            <div className="input-row">
+              <div className="input-group">
+                <label htmlFor="securityLocation" className="input-label">Security Location/Gate</label>
+                <select
+                  id="securityLocation"
+                  name="securityLocation"
+                  required
+                  value={formData.securityLocation}
+                  onChange={handleInputChange}
+                  className="form-input"
+                >
+                  <option value="">Select Location</option>
+                  {securityLocations.map(location => (
+                    <option key={location.id} value={location.id}>
+                      {location.name}
                     </option>
-                  ))
-                }
-              </select>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="year" className="input-label">Year of Employment</label>
+                <input
+                  id="year"
+                  name="year"
+                  type="text"
+                  required
+                  value={formData.year}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., 24 (for 2024)"
+                  maxLength={2}
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="staffId" className="input-label">
+                Security ID
+                {formData.year && (
+                  <span className="id-preview">
+                    Format: {generateVUGId('security', '', formData.year)}###
+                  </span>
+                )}
+              </label>
+              <input
+                id="staffId"
+                name="staffId"
+                type="text"
+                required
+                value={formData.staffId}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder={formData.year ? 
+                  `${generateVUGId('security', '', formData.year)}001` : 
+                  "e.g., VUG/SEC/24/001"}
+              />
             </div>
           </>
         );

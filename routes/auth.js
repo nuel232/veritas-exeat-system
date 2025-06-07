@@ -49,8 +49,8 @@ router.post('/register', [
   
   // Staff/Dean/Security validations
   body('office').custom((value, { req }) => {
-    if (['staff', 'dean', 'security'].includes(req.body.role) && !value) {
-      throw new Error('Office is required for staff, dean, and security roles');
+    if (['staff', 'dean'].includes(req.body.role) && !value) {
+      throw new Error('Office is required for staff and dean roles');
     }
     return true;
   }),
@@ -61,12 +61,24 @@ router.post('/register', [
     return true;
   }),
   body('staffType').custom((value, { req }) => {
-    if (['staff', 'dean', 'security'].includes(req.body.role) && !value) {
-      throw new Error('Staff type is required for staff, dean, and security roles');
+    if (req.body.role === 'staff' && !value) {
+      throw new Error('Staff type is required for staff role');
     }
-    const validStaffTypes = ['father', 'sister', 'hostel_admin', 'dean', 'security_guard'];
-    if (['staff', 'dean', 'security'].includes(req.body.role) && !validStaffTypes.includes(value)) {
+    const validStaffTypes = ['father', 'sister', 'hostel_admin'];
+    if (req.body.role === 'staff' && !validStaffTypes.includes(value)) {
       throw new Error('Invalid staff type');
+    }
+    return true;
+  }),
+  body('securityLocation').custom((value, { req }) => {
+    if (req.body.role === 'security' && !value) {
+      throw new Error('Security location is required for security role');
+    }
+    return true;
+  }),
+  body('year').custom((value, { req }) => {
+    if (['student', 'staff', 'dean', 'security'].includes(req.body.role) && !value) {
+      throw new Error('Year is required');
     }
     return true;
   }),

@@ -58,7 +58,7 @@ const UserSchema = new mongoose.Schema({
   office: {
     type: String,
     required: function() {
-      return ['staff', 'dean', 'security'].includes(this.role);
+      return ['staff', 'dean'].includes(this.role);
     }
   },
   staffId: {
@@ -71,9 +71,22 @@ const UserSchema = new mongoose.Schema({
   },
   staffType: {
     type: String,
-    enum: ['father', 'sister', 'hostel_admin', 'dean', 'security_guard'],
+    enum: ['father', 'sister', 'hostel_admin'],
     required: function() {
-      return ['staff', 'dean', 'security'].includes(this.role);
+      return this.role === 'staff';
+    }
+  },
+  securityLocation: {
+    type: String,
+    enum: ['main_gate', 'hostel_gate', 'academic_gate', 'back_gate', 'sports_complex'],
+    required: function() {
+      return this.role === 'security';
+    }
+  },
+  year: {
+    type: String,
+    required: function() {
+      return ['student', 'staff', 'dean', 'security'].includes(this.role);
     }
   },
   children: [{
@@ -129,5 +142,4 @@ UserSchema.methods.canApproveFor = function(studentGender) {
   return false;
 };
 
-module.exports = mongoose.model('User', UserSchema); 
 module.exports = mongoose.model('User', UserSchema); 
