@@ -10,7 +10,7 @@ router.post('/register', [
   // Common validations for all users
   body('firstName').notEmpty().withMessage('First name is required'),
   body('lastName').notEmpty().withMessage('Last name is required'),
-  body('email').isEmail().withMessage('Please enter a valid email'),
+  body('email').optional(),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
   body('role').isIn(['student', 'parent', 'security', 'staff']).withMessage('Invalid role'),
   body('phoneNumber').notEmpty().withMessage('Phone number is required'),
@@ -147,6 +147,19 @@ router.post('/register', [
       });
     }
 
+    // Generate email based on role and ID
+    let generatedEmail = '';
+    if (req.body.role === 'student') {
+      generatedEmail = `${req.body.matricNumber}@edu.veritas.ng`;
+    } else if (req.body.role === 'staff') {
+      generatedEmail = `${req.body.staffId}@edu.veritas.ng`;
+    } else if (req.body.role === 'security') {
+      generatedEmail = `${req.body.staffId}@edu.veritas.ng`;
+    } else if (req.body.role === 'dean') {
+      generatedEmail = `${req.body.staffId}@edu.veritas.ng`;
+    }
+    req.body.email = generatedEmail;
+
     // Create new user
     user = new User(req.body);
     await user.save();
@@ -164,7 +177,8 @@ router.post('/register', [
 
     res.status(201).json({
       token,
-      user: userResponse
+      user: userResponse,
+      generatedEmail
     });
   } catch (error) {
     console.error('Registration error:', error);

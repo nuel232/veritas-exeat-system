@@ -60,6 +60,11 @@ const Register = () => {
   // Ref for search dropdown to handle click outside
   const searchDropdownRefs = useRef({});
 
+  // Add state for showing modal and storing generated email
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [generatedEmail, setGeneratedEmail] = useState('');
+  const [generatedPassword, setGeneratedPassword] = useState('');
+
   // Update role when URL param changes
   useEffect(() => {
     const role = searchParams.get('role') || 'student';
@@ -301,6 +306,9 @@ const Register = () => {
       const response = await api.post('/api/auth/register', formData);
       sessionStorage.setItem('token', response.data.token);
       sessionStorage.setItem('user', JSON.stringify(response.data.user));
+      setGeneratedEmail(response.data.generatedEmail);
+      setGeneratedPassword(formData.password);
+      setShowSuccessModal(true);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Registration failed');
@@ -701,20 +709,6 @@ const Register = () => {
 
               <div className="input-row">
                 <div className="input-group">
-                  <label htmlFor="email" className="input-label">Email Address</label>
-                    <input
-                    id="email"
-                    name="email"
-                      type="email"
-                    required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                    className="form-input"
-                      placeholder="your.email@example.com"
-                    />
-                </div>
-                
-                <div className="input-group">
                   <label htmlFor="phoneNumber" className="input-label">Phone Number</label>
                     <input
                     id="phoneNumber"
@@ -796,6 +790,27 @@ const Register = () => {
             </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="success-modal">
+          <div className="modal-content">
+            <h2>Registration Successful!</h2>
+            <p>Your account has been created. Here are your login credentials:</p>
+            <div className="credential-row">
+              <span>Email:</span>
+              <span className="credential-value">{generatedEmail}</span>
+              <button onClick={() => navigator.clipboard.writeText(generatedEmail)}>Copy</button>
+            </div>
+            <div className="credential-row">
+              <span>Password:</span>
+              <span className="credential-value">{generatedPassword}</span>
+              <button onClick={() => navigator.clipboard.writeText(generatedPassword)}>Copy</button>
+            </div>
+            <button className="close-modal-btn" onClick={() => setShowSuccessModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
