@@ -291,12 +291,10 @@ const Register = () => {
           setLoading(false);
           return;
         }
-        
         // Check if all children have valid data (from search results)
         const invalidChildren = formData.children.filter(child => 
           !child.matricNumber || !child.firstName || !child.lastName
         );
-        
         if (invalidChildren.length > 0) {
           setError('Please select valid students from the search results for all children');
           setLoading(false);
@@ -304,18 +302,30 @@ const Register = () => {
         }
       }
 
-      const response = await api.post('/api/auth/register', formData);
+      // Only send gender for students
+      const payload = { ...formData };
+      if (selectedRole !== 'student') {
+        delete payload.gender;
+      }
+
+      const response = await api.post('/api/auth/register', payload);
       sessionStorage.setItem('token', response.data.token);
       sessionStorage.setItem('user', JSON.stringify(response.data.user));
       setGeneratedEmail(response.data.generatedEmail);
       setGeneratedPassword(formData.password);
       setShowSuccessModal(true);
-      navigate('/dashboard');
+      // Do NOT navigate here; wait for modal close
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Registration failed');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Add a handler to close the modal and navigate
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    navigate('/dashboard');
   };
 
   const renderRoleSpecificFields = () => {
@@ -605,6 +615,32 @@ const Register = () => {
                 placeholder="e.g., VUG/STAFF/24/001"
               />
             </div>
+            <div className="input-group">
+              <label htmlFor="year" className="input-label">Year</label>
+              <input
+                id="year"
+                name="year"
+                type="text"
+                required
+                value={formData.year}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="e.g., 24"
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="personalEmail" className="input-label">Personal Email</label>
+              <input
+                id="personalEmail"
+                name="personalEmail"
+                type="email"
+                required
+                value={formData.personalEmail}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="your@email.com"
+              />
+            </div>
           </>
         );
 
@@ -627,6 +663,32 @@ const Register = () => {
                 onChange={handleInputChange}
                 className="form-input"
                 placeholder="e.g., VUG/SEC/24/001"
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="year" className="input-label">Year</label>
+              <input
+                id="year"
+                name="year"
+                type="text"
+                required
+                value={formData.year}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="e.g., 24"
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="personalEmail" className="input-label">Personal Email</label>
+              <input
+                id="personalEmail"
+                name="personalEmail"
+                type="email"
+                required
+                value={formData.personalEmail}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="your@email.com"
               />
             </div>
           </>
@@ -822,7 +884,7 @@ const Register = () => {
               <span className="credential-value">{generatedPassword}</span>
               <button onClick={() => navigator.clipboard.writeText(generatedPassword)}>Copy</button>
             </div>
-            <button className="close-modal-btn" onClick={() => setShowSuccessModal(false)}>Cancel</button>
+            <button className="close-modal-btn" onClick={handleCloseModal}>Continue</button>
           </div>
         </div>
       )}
