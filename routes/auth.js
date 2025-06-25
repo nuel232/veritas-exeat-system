@@ -103,9 +103,11 @@ router.post('/register', [
   })
 ], async (req, res) => {
   try {
+    console.log('Incoming registration request:', req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      console.error('Validation errors:', errors.array());
+      return res.status(400).json({ errors: errors.array(), message: 'Validation failed. Please check your input.' });
     }
 
     const { email } = req.body;
@@ -113,14 +115,16 @@ router.post('/register', [
     // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: 'User already exists' });
+      console.error('User already exists:', email);
+      return res.status(400).json({ message: 'A user with this email already exists.' });
     }
 
     // For students, check if matricNumber is already taken
     if (req.body.role === 'student') {
       const existingStudent = await User.findOne({ matricNumber: req.body.matricNumber });
       if (existingStudent) {
-        return res.status(400).json({ message: 'Matric number already exists' });
+        console.error('Matric number already exists:', req.body.matricNumber);
+        return res.status(400).json({ message: 'A student with this matric number already exists.' });
       }
     }
 
@@ -128,7 +132,8 @@ router.post('/register', [
     if (['staff', 'security'].includes(req.body.role)) {
       const existingStaff = await User.findOne({ staffId: req.body.staffId });
       if (existingStaff) {
-        return res.status(400).json({ message: 'Staff ID already exists' });
+        console.error('Staff ID already exists:', req.body.staffId);
+        return res.status(400).json({ message: 'A user with this staff ID already exists.' });
       }
     }
 
@@ -141,8 +146,9 @@ router.post('/register', [
       });
       
       if (existingStudents.length !== matricNumbers.length) {
+        console.error('One or more students not found for parent registration:', matricNumbers);
         return res.status(400).json({ 
-          message: 'One or more students not found with the provided matric numbers' 
+          message: 'One or more students not found with the provided matric numbers. Please check the children information.' 
         });
       }
 
@@ -178,16 +184,17 @@ router.post('/register', [
     user = new User(req.body);
     await user.save();
 
+    // After saving the user to the database
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    console.log(`Successfully added to database: ${user.email}`);
+
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
-
-    // Remove password from response
-    const userResponse = user.toObject();
-    delete userResponse.password;
 
     res.status(201).json({
       token,
@@ -196,7 +203,7 @@ router.post('/register', [
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: 'Server error during registration. Please try again later or contact support.', error: error.message });
   }
 });
 
@@ -309,29 +316,24 @@ router.get('/parent-approval/:token', async (req, res) => {
 // Search students endpoint for parent registration
 router.get('/search-students', async (req, res) => {
   try {
-    const { query } = req.query;
-    
-    if (!query || query.length < 2) {
-      return res.json({ students: [] });
+    console.log('Student search query:', req.query.query);
+    if (!req.query.query) {
+      console.error('No search query provided');
+      return res.status(400).json({ message: 'No search query provided.' });
     }
-
-    // Search for students by firstName, lastName, or matricNumber
     const students = await User.find({
       role: 'student',
       $or: [
-        { firstName: { $regex: query, $options: 'i' } },
-        { lastName: { $regex: query, $options: 'i' } },
-        { matricNumber: { $regex: query, $options: 'i' } }
+        { firstName: { $regex: req.query.query, $options: 'i' } },
+        { lastName: { $regex: req.query.query, $options: 'i' } },
+        { matricNumber: { $regex: req.query.query, $options: 'i' } }
       ]
-    })
-    .select('firstName lastName matricNumber department')
-    .limit(10)
-    .sort({ firstName: 1, lastName: 1 });
-
+    });
+    console.log(`Found ${students.length} students for query:`, req.query.query);
     res.json({ students });
   } catch (error) {
-    console.error('Error searching students:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Student search error:', error);
+    res.status(500).json({ message: 'Server error during student search. Please try again later or contact support.', error: error.message });
   }
 });
 

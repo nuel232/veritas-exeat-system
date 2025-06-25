@@ -808,9 +808,8 @@ const Register = () => {
 
       {/* Success Modal */}
       {showSuccessModal && (
-        <div className="success-modal" onClick={() => setShowSuccessModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button className="close-modal-x" onClick={() => setShowSuccessModal(false)} aria-label="Close modal" style={{position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer'}}>&times;</button>
+        <div className="success-modal">
+          <div className="modal-content">
             <h2>Registration Successful!</h2>
             <p>Your account has been created. Here are your login credentials:</p>
             <div className="credential-row">
@@ -823,7 +822,7 @@ const Register = () => {
               <span className="credential-value">{generatedPassword}</span>
               <button onClick={() => navigator.clipboard.writeText(generatedPassword)}>Copy</button>
             </div>
-            <button className="close-modal-btn" onClick={() => setShowSuccessModal(false)}>Close</button>
+            <button className="close-modal-btn" onClick={() => setShowSuccessModal(false)}>Cancel</button>
           </div>
         </div>
       )}
