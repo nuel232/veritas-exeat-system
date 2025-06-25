@@ -473,7 +473,21 @@ const Dashboard = () => {
         });
 
         // Make the API request with proper auth header
-        const endpoint = user.role === 'admin' ? '/api/exeat' : '/api/exeat/my-requests';
+        let endpoint = null;
+        if (user.role === 'admin') {
+          endpoint = '/api/exeat';
+        } else if (user.role === 'student') {
+          endpoint = '/api/exeat/my-requests';
+        } else if (user.role === 'staff' || user.role === 'dean') {
+          endpoint = '/api/exeat/pending-approval';
+        }
+
+        if (!endpoint) {
+          setError('Your role does not have access to exeat requests.');
+          setLoading(false);
+          return;
+        }
+
         const res = await api.get(endpoint, {
           headers: {
             'Authorization': `Bearer ${token}`,

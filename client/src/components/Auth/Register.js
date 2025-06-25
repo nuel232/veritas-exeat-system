@@ -306,6 +306,7 @@ const Register = () => {
       const payload = { ...formData };
       if (selectedRole !== 'student') {
         delete payload.gender;
+        delete payload.matricNumber;
       }
 
       const response = await api.post('/api/auth/register', payload);

@@ -7,20 +7,6 @@ const User = require('../models/User');
 const { upload, handleUploadErrors } = require('../middleware/fileUpload');
 const crypto = require('crypto');
 const QRCode = require('qrcode');
-const nodemailer = require('nodemailer');
-
-// Email transporter setup
-const createEmailTransporter = () => {
-  return nodemailer.createTransporter({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-};
 
 // Create new exeat request with file upload
 router.post('/', [
@@ -82,9 +68,6 @@ router.post('/', [
 
     await exeatRequest.save();
 
-    // Send parent approval email
-    await sendParentApprovalEmail(exeatRequest, student, req);
-
     res.status(201).json({
       message: 'Exeat request submitted successfully. Parent approval email sent.',
       exeatRequest: {
@@ -102,50 +85,6 @@ router.post('/', [
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
-// Send parent approval email
-async function sendParentApprovalEmail(exeatRequest, student, req) {
-  const transporter = createEmailTransporter();
-  const approvalUrl = `${req.protocol}://${req.get('host')}/parent-approval/${exeatRequest._id}/${exeatRequest.parentApproval.approvalToken}`;
-  
-  const emailHtml = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #1f2937;">Exeat Permission Request</h2>
-      <p>Dear Parent/Guardian,</p>
-      <p>Your child <strong>${student.firstName} ${student.lastName}</strong> (${student.matricNumber}) has submitted an exeat request.</p>
-      
-      <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin-top: 0;">Request Details:</h3>
-        <p><strong>Reason:</strong> ${exeatRequest.reason}</p>
-        <p><strong>Destination:</strong> ${exeatRequest.destination}</p>
-        <p><strong>Departure:</strong> ${new Date(exeatRequest.departureDate).toLocaleDateString()}</p>
-        <p><strong>Return:</strong> ${new Date(exeatRequest.returnDate).toLocaleDateString()}</p>
-        <p><strong>Emergency Contact:</strong> ${exeatRequest.emergencyContact.name} (${exeatRequest.emergencyContact.phone})</p>
-      </div>
-      
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${approvalUrl}" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">REVIEW & APPROVE REQUEST</a>
-      </div>
-      
-      <p>Please click the button above to review and approve or reject this request.</p>
-      <p>This link will expire in 7 days.</p>
-      
-      <p>Best regards,<br>Veritas University Exeat System</p>
-    </div>
-  `;
-
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: student.parentEmail,
-    subject: `Exeat Permission Request - ${student.firstName} ${student.lastName}`,
-    html: emailHtml
-  });
-
-  // Update email sent status
-  exeatRequest.parentApproval.emailSent = true;
-  exeatRequest.notifications.parentEmailSent = true;
-  await exeatRequest.save();
-}
 
 // Parent approval endpoint (public route with token verification)
 router.post('/parent-approval/:id/:token', [
