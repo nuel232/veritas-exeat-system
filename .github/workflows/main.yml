@@ -20,10 +20,10 @@ jobs:
           cache: 'npm'
           
       - name: Install Server Dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
         
       - name: Install Client Dependencies
-        run: cd client && npm ci
+        run: cd client && npm ci --legacy-peer-deps
         
       - name: Lint Server
         run: npm run lint || echo "No linting configured"
