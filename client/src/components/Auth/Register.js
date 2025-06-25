@@ -29,6 +29,7 @@ const Register = () => {
     firstName: '',
     lastName: '',
     email: '',
+    personalEmail: '',
     password: '',
     phoneNumber: '',
     role: searchParams.get('role') || 'student',
@@ -395,6 +396,20 @@ const Register = () => {
                 onChange={handleInputChange}
                 className="form-input"
                 placeholder="parent@example.com"
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="personalEmail" className="input-label">Personal Email</label>
+              <input
+                id="personalEmail"
+                name="personalEmail"
+                type="email"
+                required={selectedRole !== 'parent'}
+                value={formData.personalEmail}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="your@email.com"
               />
             </div>
           </>
@@ -793,8 +808,9 @@ const Register = () => {
 
       {/* Success Modal */}
       {showSuccessModal && (
-        <div className="success-modal">
-          <div className="modal-content">
+        <div className="success-modal" onClick={() => setShowSuccessModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <button className="close-modal-x" onClick={() => setShowSuccessModal(false)} aria-label="Close modal" style={{position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer'}}>&times;</button>
             <h2>Registration Successful!</h2>
             <p>Your account has been created. Here are your login credentials:</p>
             <div className="credential-row">

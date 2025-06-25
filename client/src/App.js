@@ -9,6 +9,7 @@ import ParentApproval from './components/Parent/ParentApproval';
 import QRScanner from './components/Security/QRScanner';
 import Navbar from './components/Layout/Navbar';
 import LandingPage from './components/Auth/LandingPage';
+import Profile from './components/Profile/Profile';
 
 const PrivateRoute = ({ children }) => {
   const token = sessionStorage.getItem('token');
@@ -73,6 +74,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </AppLayout>
     </Router>

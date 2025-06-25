@@ -94,6 +94,13 @@ const UserSchema = new mongoose.Schema({
   approvalToken: {
     type: String
   },
+  personalEmail: {
+    type: String,
+    required: function() {
+      return this.role !== 'parent';
+    },
+    match: /\S+@\S+\.\S+/
+  },
   createdAt: {
     type: Date,
     default: Date.now

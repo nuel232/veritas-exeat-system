@@ -91,6 +91,15 @@ router.post('/register', [
       }
     }
     return true;
+  }),
+  body('personalEmail').custom((value, { req }) => {
+    if (req.body.role !== 'parent' && !value) {
+      throw new Error('Personal email is required');
+    }
+    if (req.body.role !== 'parent' && value && !/\S+@\S+\.\S+/.test(value)) {
+      throw new Error('Please enter a valid personal email');
+    }
+    return true;
   })
 ], async (req, res) => {
   try {
@@ -159,6 +168,11 @@ router.post('/register', [
       generatedEmail = `${req.body.staffId}@edu.veritas.ng`;
     }
     req.body.email = generatedEmail;
+
+    // Remove staffType for non-staff roles to avoid validation errors
+    if (req.body.role !== 'staff' && 'staffType' in req.body) {
+      delete req.body.staffType;
+    }
 
     // Create new user
     user = new User(req.body);
@@ -317,6 +331,31 @@ router.get('/search-students', async (req, res) => {
     res.json({ students });
   } catch (error) {
     console.error('Error searching students:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Add profile update endpoint
+router.put('/profile', async (req, res) => {
+  try {
+    const token = req.header('x-auth-token') || req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return res.status(401).json({ message: 'No token, authorization denied' });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    // Allow updating personalEmail, phoneNumber, and (optionally) other fields
+    const updatableFields = ['personalEmail', 'phoneNumber'];
+    updatableFields.forEach(field => {
+      if (req.body[field]) user[field] = req.body[field];
+    });
+    await user.save();
+    res.json({ message: 'Profile updated successfully', user });
+  } catch (error) {
+    console.error('Error updating profile:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
