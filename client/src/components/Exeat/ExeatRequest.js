@@ -15,6 +15,7 @@ const ExeatRequest = () => {
       relationship: 'Family' // Default value
     }
   });
+  const [attachments, setAttachments] = useState([]);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
@@ -152,6 +153,10 @@ const ExeatRequest = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    setAttachments(Array.from(e.target.files));
+  };
+
   const onSubmit = async e => {
     e.preventDefault();
     
@@ -181,14 +186,22 @@ const ExeatRequest = () => {
     setError('');
     
     try {
-      // Combine date and time for departure and return
-      const submitData = {
-        ...formData,
-        departureDate: new Date(departureDate).toISOString(),
-        returnDate: new Date(returnDate).toISOString()
-      };
-      
-      await api.post('/api/exeat', submitData);
+      const formDataToSend = new FormData();
+      formDataToSend.append('reason', formData.reason);
+      formDataToSend.append('destination', formData.destination);
+      formDataToSend.append('departureDate', new Date(formData.departureDate).toISOString());
+      formDataToSend.append('returnDate', new Date(formData.returnDate).toISOString());
+      formDataToSend.append('emergencyContact[name]', formData.emergencyContact.name);
+      formDataToSend.append('emergencyContact[phone]', formData.emergencyContact.phone);
+      formDataToSend.append('emergencyContact[relationship]', formData.emergencyContact.relationship);
+      attachments.forEach(file => {
+        formDataToSend.append('attachments', file);
+      });
+      await api.post('/api/exeat', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred');
@@ -323,6 +336,19 @@ const ExeatRequest = () => {
               <span className="form-error" id="emergencyphone-error">{validationErrors.emergencyphone}</span>
             )}
             <div className="form-help-text">Enter a valid phone number with country code if international</div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="attachments">Supporting Documents (optional)</label>
+            <input
+              type="file"
+              id="attachments"
+              name="attachments"
+              multiple
+              accept="image/*,video/*,.pdf,.doc,.docx"
+              onChange={handleFileChange}
+            />
+            <small>You can upload up to 5 files (images, videos, or documents).</small>
           </div>
         </div>
 
