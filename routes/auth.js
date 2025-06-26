@@ -10,7 +10,15 @@ router.post('/register', [
   // Common validations for all users
   body('firstName').notEmpty().withMessage('First name is required'),
   body('lastName').notEmpty().withMessage('Last name is required'),
-  body('email').optional(),
+  body('email').custom((value, { req }) => {
+    if (req.body.role === 'parent' && !value) {
+      throw new Error('Email is required for parents');
+    }
+    if (value && !/\S+@\S+\.\S+/.test(value)) {
+      throw new Error('Please enter a valid email');
+    }
+    return true;
+  }),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
   body('role').isIn(['student', 'parent', 'security', 'staff']).withMessage('Invalid role'),
   body('phoneNumber').notEmpty().withMessage('Phone number is required'),
@@ -166,18 +174,27 @@ router.post('/register', [
     let generatedEmail = '';
     if (req.body.role === 'student') {
       generatedEmail = `${req.body.matricNumber}@edu.veritas.ng`;
+      req.body.email = generatedEmail;
     } else if (req.body.role === 'staff') {
       generatedEmail = `${req.body.staffId}@edu.veritas.ng`;
+      req.body.email = generatedEmail;
     } else if (req.body.role === 'security') {
       generatedEmail = `${req.body.staffId}@edu.veritas.ng`;
+      req.body.email = generatedEmail;
     } else if (req.body.role === 'dean') {
       generatedEmail = `${req.body.staffId}@edu.veritas.ng`;
+      req.body.email = generatedEmail;
     }
-    req.body.email = generatedEmail;
+    // For parents, do not overwrite the provided email
 
     // Remove staffType for non-staff roles to avoid validation errors
     if (req.body.role !== 'staff' && 'staffType' in req.body) {
       delete req.body.staffType;
+    }
+    // Remove staffId and office for non-staff, non-security, non-dean roles to avoid unique index and validation errors
+    if (!['staff', 'security', 'dean'].includes(req.body.role)) {
+      if ('staffId' in req.body) delete req.body.staffId;
+      if ('office' in req.body) delete req.body.office;
     }
 
     // Create new user

@@ -428,128 +428,143 @@ const Register = () => {
 
       case 'parent':
         return (
-          <div className="children-section">
-            <div className="children-header">
-              <label className="section-label">Children Information</label>
-              <button
-                type="button"
-                onClick={addChild}
-                className="add-child-btn"
-              >
-                <Plus size={16} />
-                Add Child
-              </button>
+          <>
+            <div className="input-group">
+              <label htmlFor="email" className="input-label">Parent Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder="Enter your email"
+              />
             </div>
-
-            {formData.children.length === 0 && (
-              <div className="empty-children">
-                <Users className="empty-icon" size={48} />
-                <p>No children added yet</p>
+            <div className="children-section">
+              <div className="children-header">
+                <label className="section-label">Children Information</label>
                 <button
                   type="button"
                   onClick={addChild}
-                  className="add-first-child-btn"
+                  className="add-child-btn"
                 >
-                  Add your first child
+                  <Plus size={16} />
+                  Add Child
                 </button>
               </div>
-            )}
-            
-            {formData.children.map((child, index) => (
-              <div key={index} className="child-card">
-                <div className="child-header">
-                  <h4>Child {index + 1}</h4>
+
+              {formData.children.length === 0 && (
+                <div className="empty-children">
+                  <Users className="empty-icon" size={48} />
+                  <p>No children added yet</p>
                   <button
                     type="button"
-                    onClick={() => removeChild(index)}
-                    className="remove-child-btn"
+                    onClick={addChild}
+                    className="add-first-child-btn"
                   >
-                    <X size={16} />
+                    Add your first child
                   </button>
                 </div>
-                
-                <div className="child-inputs">
-                  <div 
-                    className="search-input-wrapper"
-                    ref={el => searchDropdownRefs.current[index] = el}
-                  >
-                    <input
-                      type="text"
-                      placeholder="Search by name or matric number..."
-                      value={child.searchQuery || ''}
-                      onChange={(e) => updateChild(index, 'searchQuery', e.target.value)}
-                      onKeyDown={(e) => handleSearchKeyDown(e, index)}
-                      className="form-input search-input"
-                      autoComplete="off"
-                    />
-                    {isSearching && (
-                      <div className="search-loading">
-                        <Loader size={16} className="loading-icon" />
-                      </div>
-                    )}
-                    
-                    {showSearchResults[index] && studentSearchResults.length > 0 && (
-                      <div className="search-results-dropdown">
-                        {studentSearchResults.map((student, resultIndex) => (
-                          <div
-                            key={student._id}
-                            className={`search-result-item ${resultIndex === activeSearchIndex ? 'active' : ''}`}
-                            onClick={() => selectStudent(student, index)}
-                            onMouseEnter={() => setActiveSearchIndex(resultIndex)}
-                          >
-                            <div className="student-info">
-                              <div className="student-name">
-                                {student.firstName} {student.lastName}
-                              </div>
-                              <div className="student-details">
-                                {student.matricNumber} • {student.department}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {showSearchResults[index] && child.searchQuery && child.searchQuery.length >= 2 && studentSearchResults.length === 0 && !isSearching && (
-                      <div className="search-results-dropdown">
-                        <div className="no-results">
-                          No students found matching "{child.searchQuery}"
-                        </div>
-                      </div>
-                    )}
+              )}
+              
+              {formData.children.map((child, index) => (
+                <div key={index} className="child-card">
+                  <div className="child-header">
+                    <h4>Child {index + 1}</h4>
+                    <button
+                      type="button"
+                      onClick={() => removeChild(index)}
+                      className="remove-child-btn"
+                    >
+                      <X size={16} />
+                    </button>
                   </div>
                   
-                  <input
-                    type="text"
-                    placeholder="Matric Number"
-                    value={child.matricNumber}
-                    onChange={(e) => updateChild(index, 'matricNumber', e.target.value)}
-                    className="form-input"
-                    required
-                    readOnly
-                  />
-                  <input
-                    type="text"
-                    placeholder="First Name"
-                    value={child.firstName}
-                    onChange={(e) => updateChild(index, 'firstName', e.target.value)}
-                    className="form-input"
-                    required
-                    readOnly
-                  />
-                  <input
-                    type="text"
-                    placeholder="Last Name"
-                    value={child.lastName}
-                    onChange={(e) => updateChild(index, 'lastName', e.target.value)}
-                    className="form-input"
-                    required
-                    readOnly
-                  />
+                  <div className="child-inputs">
+                    <div 
+                      className="search-input-wrapper"
+                      ref={el => searchDropdownRefs.current[index] = el}
+                    >
+                      <input
+                        type="text"
+                        placeholder="Search by name or matric number..."
+                        value={child.searchQuery || ''}
+                        onChange={(e) => updateChild(index, 'searchQuery', e.target.value)}
+                        onKeyDown={(e) => handleSearchKeyDown(e, index)}
+                        className="form-input search-input"
+                        autoComplete="off"
+                      />
+                      {isSearching && (
+                        <div className="search-loading">
+                          <Loader size={16} className="loading-icon" />
+                        </div>
+                      )}
+                      
+                      {showSearchResults[index] && studentSearchResults.length > 0 && (
+                        <div className="search-results-dropdown">
+                          {studentSearchResults.map((student, resultIndex) => (
+                            <div
+                              key={student._id}
+                              className={`search-result-item ${resultIndex === activeSearchIndex ? 'active' : ''}`}
+                              onClick={() => selectStudent(student, index)}
+                              onMouseEnter={() => setActiveSearchIndex(resultIndex)}
+                            >
+                              <div className="student-info">
+                                <div className="student-name">
+                                  {student.firstName} {student.lastName}
+                                </div>
+                                <div className="student-details">
+                                  {student.matricNumber} • {student.department}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {showSearchResults[index] && child.searchQuery && child.searchQuery.length >= 2 && studentSearchResults.length === 0 && !isSearching && (
+                        <div className="search-results-dropdown">
+                          <div className="no-results">
+                            No students found matching "{child.searchQuery}"
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <input
+                      type="text"
+                      placeholder="Matric Number"
+                      value={child.matricNumber}
+                      onChange={(e) => updateChild(index, 'matricNumber', e.target.value)}
+                      className="form-input"
+                      required
+                      readOnly
+                    />
+                    <input
+                      type="text"
+                      placeholder="First Name"
+                      value={child.firstName}
+                      onChange={(e) => updateChild(index, 'firstName', e.target.value)}
+                      className="form-input"
+                      required
+                      readOnly
+                    />
+                    <input
+                      type="text"
+                      placeholder="Last Name"
+                      value={child.lastName}
+                      onChange={(e) => updateChild(index, 'lastName', e.target.value)}
+                      className="form-input"
+                      required
+                      readOnly
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         );
 
       case 'staff':
@@ -877,8 +892,8 @@ const Register = () => {
             <p>Your account has been created. Here are your login credentials:</p>
             <div className="credential-row">
               <span>Email:</span>
-              <span className="credential-value">{generatedEmail}</span>
-              <button onClick={() => navigator.clipboard.writeText(generatedEmail)}>Copy</button>
+              <span className="credential-value">{generatedEmail || formData.email}</span>
+              <button onClick={() => navigator.clipboard.writeText(generatedEmail || formData.email)}>Copy</button>
             </div>
             <div className="credential-row">
               <span>Password:</span>

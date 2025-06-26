@@ -18,7 +18,24 @@ const users = [
     department: 'Computer Science',
     matricNumber: 'CS123456',
     phoneNumber: '1234567890',
-    parentEmail: 'parent@example.com'
+    parentEmail: 'parent@example.com',
+    personalEmail: 'student.personal@example.com',
+    year: '2023',
+    gender: 'male'
+  },
+  {
+    firstName: 'Test',
+    lastName: 'Student',
+    email: 'teststudent@example.com',
+    password: 'password123',
+    role: 'student',
+    department: 'Computer Science',
+    matricNumber: 'CS999999',
+    phoneNumber: '1234567890',
+    parentEmail: 'parent@example.com',
+    personalEmail: 'teststudent.personal@example.com',
+    year: '2023',
+    gender: 'male'
   },
   {
     firstName: 'Dean',
@@ -28,7 +45,10 @@ const users = [
     role: 'dean',
     phoneNumber: '0987654321',
     office: 'Dean Office',
-    staffId: 'DEAN001'
+    staffId: 'DEAN001',
+    personalEmail: 'dean.personal@example.com',
+    year: '2023',
+    gender: 'male'
   },
   {
     firstName: 'Security',
@@ -38,17 +58,10 @@ const users = [
     role: 'security',
     phoneNumber: '5555555555',
     office: 'Main Gate',
-    staffId: 'SEC001'
-  },
-  {
-    firstName: 'Admin',
-    lastName: 'User',
-    email: 'admin@example.com',
-    password: 'password123',
-    role: 'admin',
-    phoneNumber: '1111111111',
-    office: 'Admin Office',
-    staffId: 'ADM001'
+    staffId: 'SEC001',
+    personalEmail: 'security.personal@example.com',
+    year: '2023',
+    gender: 'male'
   }
 ];
 
