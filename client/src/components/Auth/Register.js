@@ -893,12 +893,24 @@ const Register = () => {
             <div className="credential-row">
               <span>Email:</span>
               <span className="credential-value">{generatedEmail || formData.email}</span>
-              <button onClick={() => navigator.clipboard.writeText(generatedEmail || formData.email)}>Copy</button>
+              <button onClick={() => {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(generatedEmail || formData.email);
+                } else {
+                  alert('Clipboard not supported in this browser.');
+                }
+              }}>Copy</button>
             </div>
             <div className="credential-row">
               <span>Password:</span>
               <span className="credential-value">{generatedPassword}</span>
-              <button onClick={() => navigator.clipboard.writeText(generatedPassword)}>Copy</button>
+              <button onClick={() => {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(generatedPassword);
+                } else {
+                  alert('Clipboard not supported in this browser.');
+                }
+              }}>Copy</button>
             </div>
             <button className="close-modal-btn" onClick={handleCloseModal}>Continue</button>
           </div>
@@ -908,4 +920,4 @@ const Register = () => {
   );
 };
 
-export default Register; 
+export default Register;
