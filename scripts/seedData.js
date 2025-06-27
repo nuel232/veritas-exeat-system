@@ -12,8 +12,8 @@ const users = [
   {
     firstName: 'Student',
     lastName: 'User',
-    email: 'student@example.com',
-    password: 'password123',
+    email: 'testuser@example.com',
+    password: 'TestPassword123!',
     role: 'student',
     department: 'Computer Science',
     matricNumber: 'CS123456',
@@ -26,8 +26,8 @@ const users = [
   {
     firstName: 'Test',
     lastName: 'Student',
-    email: 'teststudent@example.com',
-    password: 'password123',
+    email: 'testuser@example.com',
+    password: 'TestPassword123!',
     role: 'student',
     department: 'Computer Science',
     matricNumber: 'CS999999',
@@ -40,8 +40,8 @@ const users = [
   {
     firstName: 'Dean',
     lastName: 'User',
-    email: 'dean@example.com',
-    password: 'password123',
+    email: 'testuser@example.com',
+    password: 'TestPassword123!',
     role: 'dean',
     phoneNumber: '0987654321',
     office: 'Dean Office',
@@ -53,8 +53,8 @@ const users = [
   {
     firstName: 'Security',
     lastName: 'User',
-    email: 'security@example.com',
-    password: 'password123',
+    email: 'testuser@example.com',
+    password: 'TestPassword123!',
     role: 'security',
     phoneNumber: '5555555555',
     office: 'Main Gate',
@@ -221,4 +221,4 @@ async function seedDatabase() {
 }
 
 // Run the seeding function
-seedDatabase(); 
+seedDatabase();
